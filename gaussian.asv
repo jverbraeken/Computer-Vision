@@ -15,8 +15,5 @@ end
 %% Exercise 2
 
 function imOut = gaussianConv(image_path, sigma_x, sigma_y)
-    originalRGB = imread('zebra.png');
-    img_x = imfilter(originalRGB, G);
-    img_y = imfilter(img_x, G);
-    imshow(img_y)
+
 end
