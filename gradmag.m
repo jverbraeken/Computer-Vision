@@ -3,6 +3,7 @@ function [magnitude, orientation] = gradmag(img, sigma)
     img_x = imfilter(double(img), h);
     img_y = imfilter(double(img), h');
     
+    
     magnitude = sqrt(img_x.^2 + img_y.^2);
     orientation = atan(img_y./img_x);
     
