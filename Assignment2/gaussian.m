@@ -1,9 +1,13 @@
-%% Assignment 1, Exercise 1
-
 function G = gaussian(sigma)
-    halfsize = ceil(3*sigma);
-    
-    x = -halfsize:halfsize;
-    G = exp(-x.^2/(2*sigma^2)) * (1/(sqrt(sigma*2*pi)));
-   
+
+L = ceil(3*sigma);
+
+if sigma == 0
+    G = 0;
+else
+    G = 1/(sigma*sqrt(2*pi)) * exp(-(-L:L).^2/(2*sigma^2));
+    %(normalization)
+    G = G / sum(G);
+end
+
 end
