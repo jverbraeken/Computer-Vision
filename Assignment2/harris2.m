@@ -28,8 +28,8 @@ function [r, c, sigmas] = harris2(im, loc)
 
     
     % Allocate R 
-    R = zeros(size(im,1), size(im,2), 2); 
-    
+    %R = zeros(size(im,1), size(im,2), 2); 
+    R = zeros(size(loc,1), 2);
     
     % Smooth M with a gaussian at the integration scale sigma.
     % Keep only points from the list 'loc' that are corners. 
@@ -41,10 +41,10 @@ function [r, c, sigmas] = harris2(im, loc)
 	
         % Compute the cornerness R at the current location
         k = 0.04;
-        trace_l = M(:, :, 1) + M(:, :, 2);
-        det_l = M(:, :, 1) .* M(:, :, 2) - M(:, :, 3) .^ 2;
+        trace_l = M(loc(l,2), loc(l,1), 1) + M(loc(l,2), loc(l,1), 2);
+        det_l = M(loc(l,2), loc(l,1), 1) .* M(loc(l,2), loc(l,1), 2) - M(loc(l,2), loc(l,1), 3) .^ 2;
         %R(loc(l,2), loc(l,1), 1) = det_l - k*trace_l^2;
-        
+        R(l,1) =  det_l - k*trace_l^2;
 	% Store current sigma as well
         %R(loc(l,2), loc(l,1), 2) = sigma;
         R(l,2) = sigma;
@@ -58,7 +58,7 @@ function [r, c, sigmas] = harris2(im, loc)
 
    
     % Set the threshold 
-    threshold = 0.01 * max(R(:,:,1), [], 'all');
+    threshold = 0.1 * max(R(:,:,1), [], 'omitnan');
 
     % Find local maxima
     % Dilation will alter every pixel except local maxima in a 3x3 square area.
