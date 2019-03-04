@@ -9,7 +9,9 @@ function [r, c, sigmas] = harris(im, loc)
     % Calculate Gaussian Derivatives at derivative-scale. 
     % NOTE: The sigma is independent of the window size (which dependes on the Laplacian responses).
     % Hint: use your previously implemented function in assignment 1 
+
     %im = rgb2gray(im);
+
     
     gamma = 0.7;
     
