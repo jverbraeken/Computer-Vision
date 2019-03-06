@@ -22,13 +22,14 @@ function imgout = mosaic(varargin)
     % For all other images
     for i = 2:nargin
         % Load next image
-        imnew = ...
+        imnew = varargin{i};
     
         % Get transformation of this new image to previous image
-	best_h = ...
+        [~, best_h, ~, ~] = imageAlign(imtarget, imnew);
 	
-	% Define the transformation matrix from 'best_h' (best affine parameters) 	
-        A(:,:,i) = ...
+        % Define the transformation matrix from 'best_h' (best affine parameters) 	
+        A(:,:,i) = [best_h(1) best_h(2) best_h(5);...
+            best_h(3) best_h(4) best_h(6); 0 0 1];
     
         % Combine the affine transformation with all previous matrices
         % to get the transformation to the first image
@@ -41,10 +42,10 @@ function imgout = mosaic(varargin)
     end
 
     % Find size of output image
-    minx = ...
-    maxx = ...
-    miny = ...
-    maxy = ...
+    minx = 1;
+    maxx = ceil(max(corners(2, :)));
+    miny = 1;
+    maxy = ceil(max(corners(1, :)));
 
     % Output image
     imgout = zeros(maxy-miny+1, maxx-minx+1, nargin);
@@ -55,14 +56,15 @@ function imgout = mosaic(varargin)
 
     % Transform each image to the coordinate system
     for i=1:nargin
-        tform         = ...
-        newtimg       = imtransform(...
+        tform         = affine2d([A(:,1,i); A(:,2,i); A(:,3,i)]);
+        newtimg       = imtransform(varargin{i}, tform, 'bicubic');
         imgout(:,:,i) = newtimg;
     end
 
     % Blending methods to combine: nanmedian (stable for longer sequences of images)
-    imgout = nanmean();
+    imgout = nanmean(imgout, 3);
 
     % Show stitched image
     figure; imshow(imgout);
+    
 end
