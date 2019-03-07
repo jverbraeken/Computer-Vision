@@ -61,7 +61,7 @@ function best_h = ransac_affine(match1, match2, im1, im2)
         
 
         % (6) Save the best model and redefine the stopping iterations
-        if (length(inliers) > bestinliers)
+        if (length(inliers) > length(bestinliers))
             bestinliers = inliers;
             best_h = h;
             iterations = round(log10(0.001) / log(1 - (length(bestinliers)/length(match1))^ P));
