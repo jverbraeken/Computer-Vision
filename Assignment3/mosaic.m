@@ -25,12 +25,12 @@ function imgout = mosaic(varargin)
         imnew = varargin{i};
     
         % Get transformation of this new image to previous image
-        [~, best_h, ~, ~] = imageAlign(imtarget, imnew);
+        [affine, ~, ~] = imageAlign(imtarget, imnew);
 	
+        affine = invert(affine);
         % Define the transformation matrix from 'best_h' (best affine parameters) 	
-        A(:,:,i) = [best_h(1) best_h(2) best_h(5);...
-            best_h(3) best_h(4) best_h(6); 0 0 1];
-    
+        A(:,:,i) = (affine.T)';
+        
         % Combine the affine transformation with all previous matrices
         % to get the transformation to the first image
         accA(:,:,i) = A(:,:,i) * accA(:,:,i-1);
@@ -38,33 +38,39 @@ function imgout = mosaic(varargin)
         % Add the corners of this image
         w = size(imnew,2);
         h = size(imnew,1);
-        corners = [corners (accA(:,:,i))*[1 1 1; w 1 1; 1 h 1; w h 1]'];
+        corners = [corners; (accA(:,:,i))*[1 1 1; w 1 1; 1 h 1; w h 1]'];
     end
 
     % Find size of output image
-    minx = 1;
-    maxx = ceil(max(corners(2, :)));
-    miny = 1;
-    maxy = ceil(max(corners(1, :)));
+    minx = ceil(min(corners(1:3:end, :), [], 2));
+    maxx = ceil(max(corners(1:3:end, :), [], 2));
+    miny = ceil(min(corners(2:3:end, :), [], 2));
+    maxy = ceil(max(corners(2:3:end, :), [], 2));
+    
+    % Output image coordinate system
+    xdata = [min(minx), max(maxx)];
+    ydata = [min(miny), max(maxy)];
 
     % Output image
-    imgout = zeros(maxy-miny+1, maxx-minx+1, nargin);
-
-    % Output image coordinate system
-    xdata = [minx, maxx];
-    ydata = [miny, maxy];
-
+    imgout = zeros(max(maxy) - min(miny) + 1, max(maxx) - min(minx) +1, nargin);
+    
     % Transform each image to the coordinate system
     for i=1:nargin
-        tform         = affine2d([A(:,1,i); A(:,2,i); A(:,3,i)]);
-        newtimg       = imtransform(varargin{i}, tform, 'bicubic');
+        tform         = affine2d([A(:,1,i)'; A(:,2,i)'; A(:,3,i)']);
+        imtarget      = varargin{i};    
+        newtimg       = imwarp(imtarget, tform, 'bicubic');
+        newtimg       = padarray(newtimg, [miny(i) - 1, minx(i) - 1], 'pre');
+        newtimg       = padarray(newtimg, [size(imgout, 1) - size(newtimg, 1), size(imgout, 2) - size(newtimg, 2)], 'post');
+        
         imgout(:,:,i) = newtimg;
     end
 
     % Blending methods to combine: nanmedian (stable for longer sequences of images)
+    imgout(imgout == 0) = NaN;
     imgout = nanmean(imgout, 3);
 
     % Show stitched image
-    figure; imshow(imgout);
+    RA = imref2d(size(imgout), xdata, ydata);
+    figure; imshow(imgout, RA, []);
     
 end

@@ -7,7 +7,7 @@
 %       affine_transform - the learned transformation between image 1 and image 2
 %       match1           - the corner points in image 1
 %       match2           - their corresponding matches in image 2
-function [affine_transform, best_h, match1, match2] = imageAlign(im1, im2)
+function [affine_transform, match1, match2] = imageAlign(im1, im2)
 
     % Load Images
     %im1 = im2double(imread('boat/img1.pgm'));
