@@ -16,25 +16,25 @@ function [M,S] = sfm()
     close all
 
     % Load initial set of points
-    X = importdata('./model_house/measurement_matrix.txt');
+    X = importdata('./model house/measurement_matrix.txt');
 
     [~, noPoints] = size(X);
     % Centering: subtract the centroid of the image points (removes translation)
-    X = ...
+    X = X - mean(X, 2);
 
     % Singular value decomposition
     % Remark: Please pay attention to using V or V'. Please check matlab function: "help svd".
-    [... ,... ,... ] = svd(X);
+    [U, S, V] = svd(X);
 
     % The matrix of measurements must have rank 3.
     % Keep only the corresponding top 3 rows/columns from the SVD decompositions.
-    U = ... 
-    W = ...
-    V = ... 
+    U = U(:, 1:3); 
+    W = S(1:3, 1:3);
+    V = V(:, 1:3);
 
     % Compute M and S: One possible decomposition is M = U W^{1/2} and S = W^{1/2} V'
-    M = ... 
-    S = ...
+    M = U * W^(1/2);
+    S = W^(1/2) * V';
     save('M','M')
 
     % Eliminate the affine ambiguity
@@ -46,58 +46,59 @@ function [M,S] = sfm()
 
     % We solve L by iterating through all images and finding L one which minimizes Ai*L*Ai' = Id, for all i.
     % LSQNONLIN solves non-linear least squares problems. Please check the Matlab documentation.
-    L = lsqnonlin(@residuals, L0);
+    L = lsqnonlin(@residuals_template, L0);
 
     % Recover C from L by Cholesky decomposition.
     C = chol(L,'lower');
 
     % Update M and S with the corresponding C form: M = MC and S = C^{-1}S. 
-    M = ...
-    S = ...
+    M = M * C;
+    S = pinv(C) * S;
 
     % Plot the obtained 3D coordinates:
-    plot3(S(1,:),S(2,:),S(3,:),'.y');
+    plot3(S(1,:),S(2,:),S(3,:),'.r');
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %%%%%%% Repeat the same procedure for the Optical Flow tracked points %%%%%%%%%%%
     % Clear variables (U,W,V,M,S,A1,L0) which have been used in first part load tracked points
+    %clear U W V M S A1 L0
     load('Xpoints')
     load('Ypoints')
     X2 = zeros(size(X));
-    X2(1:2:end,:)= ...
-    X2(2:2:end,:)= ....
+    X2(1:2:end,:)= pointsx;
+    X2(2:2:end,:)= pointsy;
 
     % Centering the data
     [~,noPoints] = size(X2);
-    X2 = ....
+    X2 = X2 - mean(X2, 2);
 
     % Perform the Singular Value Decomposition
-    [..., ..., ...] = svd(X2);
+    [U, S, V] = svd(X2);
 
     % Impose the rank 3 constraint by keeping the top 3 columns/rows for the obtained matrices.
-    U = ...
-    W = ...
-    V = ...
+    U = U(:, 1:3); 
+    W = S(1:3, 1:3);
+    V = V(:, 1:3);
 
     % Define the matrices M and S from U, W, and V.
-    M = ... 
-    S = ...
+    M = U * W^(1/2);
+    S = W^(1/2) * V';
     save('M','M') 
 
     % Solve the affine ambiguity 
-    A1 = ...
-    L0 = ...
-    L = lsqnonlin(@residuals,L0);
+    A1 = M(:, 1:2);
+    L0 = pinv(A1' * A1);
+    L = lsqnonlin(@residuals_template,L0);
 
     % Recover C from L by Cholesky decomposition
     C = chol(L,'lower');
 
     % Update M and S with the values of C: M = MC, S = C^{-1}S
-    M = ...
-    S = ...
+    M = M * C;
+    S = pinv(C) * S;
 
     % Plot the obtained 3D points as well.
     hold on
-    plot3(S(1,:),S(2,:),S(3,:),'.m');
+    plot3(S(1,:),S(2,:),S(3,:),'.');
 
 end
