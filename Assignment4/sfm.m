@@ -18,7 +18,7 @@ function [M,S] = sfm()
     % Load initial set of points
     X = importdata('./model house/measurement_matrix.txt');
 
-    [~, noPoints] = size(X);
+    %[~, noPoints] = size(X);
     % Centering: subtract the centroid of the image points (removes translation)
     X = X - mean(X, 2);
 
@@ -46,7 +46,7 @@ function [M,S] = sfm()
 
     % We solve L by iterating through all images and finding L one which minimizes Ai*L*Ai' = Id, for all i.
     % LSQNONLIN solves non-linear least squares problems. Please check the Matlab documentation.
-    L = lsqnonlin(@residuals_template, L0);
+    L = lsqnonlin(@residuals, L0);
 
     % Recover C from L by Cholesky decomposition.
     C = chol(L,'lower');
@@ -69,7 +69,7 @@ function [M,S] = sfm()
     X2(2:2:end,:)= pointsy;
 
     % Centering the data
-    [~,noPoints] = size(X2);
+    %[~,noPoints] = size(X2);
     X2 = X2 - mean(X2, 2);
 
     % Perform the Singular Value Decomposition
@@ -86,9 +86,9 @@ function [M,S] = sfm()
     save('M','M') 
 
     % Solve the affine ambiguity 
-    A1 = M(:, 1:2);
+    A1 = M(1:2, :);
     L0 = pinv(A1' * A1);
-    L = lsqnonlin(@residuals_template,L0);
+    L = lsqnonlin(@residuals,L0);
 
     % Recover C from L by Cholesky decomposition
     C = chol(L,'lower');
