@@ -7,8 +7,8 @@
 %
 % OUTPUT
 %   An image showing the 3D points in their estimated 3D world position.
-%       - Yellow dots are when using the given list of points.
-%       - Pink dots are when using the tracked points from the LKtracker.
+%       - Red dots are when using the given list of points.
+%       - Blue dots are when using the tracked points from the LKtracker.
 %   M: The transformation matrix size of 2nx3. Where n is the number of cameras i.e. images.
 %   S: The estimated 3-dimensional locations of the points (3x#points).
 
@@ -99,6 +99,6 @@ function [M,S] = sfm()
 
     % Plot the obtained 3D points as well.
     hold on
-    plot3(S(1,:),S(2,:),S(3,:),'.');
+    plot3(S(1,:),S(2,:),S(3,:),'.b');
 
 end
