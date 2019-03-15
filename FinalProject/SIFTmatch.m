@@ -40,7 +40,7 @@ function [matches] = SIFTmatch(im1, im2, tf, thres)
             % Compute the Euclidian distance of desc1 and desc2 21
             dist = sqrt(sum((desc1 - desc2) .^ 2));
             % Threshold the distances
-            if dist < threshold
+            if dist < 100
                 if secondBestDist > dist
                     if bestDist > dist
                         secondBestDist = bestDist;
