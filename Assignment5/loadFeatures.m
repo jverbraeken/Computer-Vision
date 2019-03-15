@@ -1,4 +1,4 @@
-function [feat desc nb dim]=loadFeatures(file)
+function [feat, desc, nb, dim] = loadFeatures(file)
     fid = fopen(file, 'r');
     dim = fscanf(fid, '%f',1);
 

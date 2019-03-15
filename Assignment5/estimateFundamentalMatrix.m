@@ -8,7 +8,7 @@
 %           - bestF: estimated F 
 %           - bestinliers: inliers found
           
-function [bestF bestinliers] = estimateFundamentalMatrix(match1, match2)
+function [bestF, bestinliers] = estimateFundamentalMatrix(match1, match2)
 
     % Set in homogenous coordinates
     match1 = [match1;ones(1,size(match1,2))];
@@ -20,31 +20,31 @@ function [bestF bestinliers] = estimateFundamentalMatrix(match1, match2)
 
     % Initialize RANSAC parameters
     % Total iterations (e.g. 50)
-    iterations = ...
+    iterations = 50;
 
     % Minimum of iterations
-    miniter = ...
+    miniter = 5;
 
     % How many points are needed for the Fundamental matrix?
-    p= ...
+    p = 16;
 
     % Start iterations
     i=0;
     while i<iterations
         
         % Randomly select P points from two sets of matched points
-        perm = ... 
-        seed = ...
+        perm = randperm(size(match1, 2), p);
+        %seed = 
         
         % Normalization
-        [X1,T1] = normalize();
-        [X2,T2] = normalize();
+        [X1,T1] = normalize(match1(1:2, perm));
+        [X2,T2] = normalize(match2(1:2, perm));
         
         % Compose matrix A, given matched points (X1,X2) from two images
         A = composeA(X1, X2);
         
         % Compute F given A, T1 and T2    
-        F = computeF(A,T1,T2);
+        F = computeF(A, T1, T2);
         
         % Find inliers by computing perpendicular errors between the points 
         % and the epipolar lines in each image
@@ -64,6 +64,7 @@ function [bestF bestinliers] = estimateFundamentalMatrix(match1, match2)
             % Find the final set of inliers
             inliers = computeInliers(F,match1,match2,threshold);
             
+            %{
             % if number of inlier > the best so-far, use new F
             if size(inliers,2)>bestcount
                 bestcount   = ...
@@ -81,7 +82,7 @@ function [bestF bestinliers] = estimateFundamentalMatrix(match1, match2)
             q   = ... 
             % To prevent special cases, always run at least a couple of times
             iterations = max(miniter, ceil( ... ));
-            
+            %}
         end
         i = i+1;
         

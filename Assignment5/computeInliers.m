@@ -5,12 +5,12 @@
 %   -matrix F, matched points from image1 and image 2, and a threshold (e.g. threshold=50)
 % Output: 
 %   -inliers: indices of inliers
-function inliers = computeInliers(F,match1,match2,threshold)
+function inliers = computeInliers(F, match1, match2, threshold)
 
     % Calculate Sampson distance for each point
     % Compute numerator and denominator at first
-    numer = ...
-    denom = ...
+    numer = (match2 * F * match1).^2;
+    denom = F*p;
     sd    = numer./denom;
 
     % Return inliers for which sd is smaller than threshold

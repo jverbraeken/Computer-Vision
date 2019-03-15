@@ -12,8 +12,8 @@ function F = demo_lab5()
     % Load Features and Descriptors (provided by TAs)
     % you can also extract those features using the Harris/Hessian Affine 
     % implementation which can be downloaded from http://www.robots.ox.ac.uk/~vgg/research/affine/detectors.html.
-    [feat1,desc1,~,~] = loadFeatures('TeddyBearPNG/obj02_001.png.haraff.sift');
-    [feat2,desc2,~,~] = loadFeatures('TeddyBearPNG/obj02_002.png.haraff.sift');
+    [feat1,desc1,~,~] = loadFeatures('TeddyBearPNG/obj02_001.png.harhes.sift');
+    [feat2,desc2,~,~] = loadFeatures('TeddyBearPNG/obj02_002.png.harhes.sift');
 
     % Using vl_ubcmatch to match descriptors
     disp('Matching Descriptors');
@@ -26,7 +26,7 @@ function F = demo_lab5()
 
     % Estimate Fundamental Matrix using the 8-point algorithm
     disp('Estimating F');
-    [F inliers] = estimateFundamentalMatrix(X1,X2);
+    [F, inliers] = estimateFundamentalMatrix(X1,X2);
 
     % Display Fundamental matrix
     disp('F =');

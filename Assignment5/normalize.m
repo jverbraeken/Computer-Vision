@@ -9,14 +9,14 @@
 function [Xout, T] = normalize( X )
 
     % Compute Xmean: normalize all X in each image to have 0-mean
-    Xmean =  ...
+    Xmean =  mean(X, 2);
 
     % Compute d: scale all X so that the average distance to the mean is sqrt(2).
     % Check the lab file for details.
-    d = ...
+    d = mean(sqrt(sum((X - Xmean).^2, 1)));
 
     % Compose matrix T
-    T = ...
+    T = [sqrt(2)/d 0 -Xmean(1)*sqrt(2)/d; 0 sqrt(2)/d -Xmean(1)*sqrt(2)/d];
 
     % Compute Xout using X^ = TX with one extra dimension (We are using homogenous coordinates)
     Xout = T * [X; ones(1,size(X,2))];

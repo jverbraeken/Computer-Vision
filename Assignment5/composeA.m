@@ -5,7 +5,6 @@
 % Output: 
 %   -matrix A
 function A = composeA(x1, x2)
-    A = [];
-
-    ...
+    A = [x1(1, :) .* x2(1, :), x1(1, :) .* x2(2, :), x1(1, :), x1(2, :).* x2(1, :), x1(2, :) .* x2(2, :), x1(2, :), x2(1 ,:), x2(2, :), ones(length(x1), 1)];
 end
+ss
