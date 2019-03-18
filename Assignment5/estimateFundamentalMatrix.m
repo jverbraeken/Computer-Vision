@@ -24,6 +24,8 @@ function [bestF, bestinliers] = estimateFundamentalMatrix(match1, match2)
 
     % Minimum of iterations
     miniter = 5;
+    
+    threshold = 50;
 
     % How many points are needed for the Fundamental matrix?
     p = 16;
@@ -53,7 +55,7 @@ function [bestF, bestinliers] = estimateFundamentalMatrix(match1, match2)
         
         % Check if the number of inliers is larger than 8
         % If yes, use those inliners to re-estimate (re-fine) F.    
-        if size(inliers,2)>=8
+        if size(inliers,1)>=8
             % Normalize previously found inliers
             [X1,T1] = normalize(match1(1:2, inliers));
             [X2,T2] = normalize(match2(1:2, inliers));
@@ -65,9 +67,10 @@ function [bestF, bestinliers] = estimateFundamentalMatrix(match1, match2)
             % Find the final set of inliers
             inliers = computeInliers(F,match1,match2,threshold);
             
+            
             % if number of inlier > the best so-far, use new F
             if size(inliers,2)>bestcount
-                bestcount   = size(inliers, 2);
+                bestcount   = length(inliers);
                 bestF       = F;
                 bestinliers = inliers;
             end
@@ -76,12 +79,11 @@ function [bestF, bestinliers] = estimateFundamentalMatrix(match1, match2)
             % i=log(t)/log(1-q^p),
             % where p=8 (the number of matches)
             % q= #inliers/#total_pairs (the proportion of inliers over total pairs)
-            %eps = 0.001;
-            %N1  = ...
-            %N   = ...
-            q   = size(inliers, 2) / size(match1, 2);
+            eps = 0.001;
+            q   = bestcount/length(match1);
+            N   = log10(eps)/log10(1 - q^p);
             % To prevent special cases, always run at least a couple of times
-            iterations = max(miniter, ceil(q));
+            iterations = max(miniter, ceil( N ));
         end
         i = i+1;
         
