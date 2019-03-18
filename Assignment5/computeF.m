@@ -18,7 +18,7 @@ function F = computeF(A,T1,T2)
 
     % De-normalize F
     % F= T'_2 F T_1
-    F = T2 * F * T1';  % TODO this is different than the given code
+    F = T2' * F * T1;
 
     % One more step: make sure that the norm of output_F is 1 (To deal with the scale invariance)
     F= F/norm(F);

@@ -48,6 +48,7 @@ function [bestF, bestinliers] = estimateFundamentalMatrix(match1, match2)
         
         % Find inliers by computing perpendicular errors between the points 
         % and the epipolar lines in each image
+        threshold = 10;  % TODO tune parameter
         inliers = computeInliers(F,match1,match2,threshold);
         
         % Check if the number of inliers is larger than 8

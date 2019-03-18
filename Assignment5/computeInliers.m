@@ -9,7 +9,7 @@ function inliers = computeInliers(F, match1, match2, threshold)
 
     % Calculate Sampson distance for each point
     % Compute numerator and denominator at first
-    numer = (match2 * F * match1).^2;
+    numer = (match2' * F * match1).^2;
     denom = F*p;
     sd    = numer./denom;
 
