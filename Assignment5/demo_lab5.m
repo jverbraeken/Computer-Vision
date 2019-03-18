@@ -23,6 +23,7 @@ function F = demo_lab5()
     % Get X,Y coordinates of matched features
     X1 = feat1(1:2,matches(1,:));
     X2 = feat2(1:2,matches(2,:));
+    %% 
 
     % Estimate Fundamental Matrix using the 8-point algorithm
     disp('Estimating F');

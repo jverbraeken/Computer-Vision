@@ -16,9 +16,12 @@ function [Xout, T] = normalize( X )
     d = mean(sqrt(sum((X - Xmean).^2, 1)));
 
     % Compose matrix T
-    T = [sqrt(2)/d 0 -Xmean(1)*sqrt(2)/d; 0 sqrt(2)/d -Xmean(1)*sqrt(2)/d; 0 0 1];
+    T = [sqrt(2)/d, 0, -Xmean(1)*sqrt(2)/d;
+         0, sqrt(2)/d, -Xmean(1)*sqrt(2)/d;
+         0, 0, 1];
 
     % Compute Xout using X^ = TX with one extra dimension (We are using homogenous coordinates)
-    Xout = T * [X; ones(1,size(X,2))];
+    Xout = T * [X;
+                ones(1,size(X,2))];
 
 end
