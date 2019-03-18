@@ -21,8 +21,4 @@ end
 
 %% 3rd step: Represent point correspondes for different camera views
 
-%% 4th step: Stitch points together
-
-%% 5th step: Eliminate affine ambiguity
-
-%% 6th step: Plot 3D model
+%%
