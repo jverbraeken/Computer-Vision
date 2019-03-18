@@ -2,8 +2,8 @@
 % Only works on linux
 
 %Files=dir(strcat('modelCastlePNG/*.png'));
-Files=dir(strcat('modelHouse/*.png'));
-%Files=dir(strcat('TeddyBearPNG/*.png'));
+%Files=dir(strcat('modelHouse/*.png'));
+Files=dir(strcat('TeddyBearPNG/*.png'));
 
 for i=1:length(Files)
    file = Files(i);
@@ -11,8 +11,8 @@ for i=1:length(Files)
    %command = './extract_features_64bit.ln -haraff -i ';
    
    %command = [command strcat('modelCastlePNG/', file.name)];
-   command = [command strcat('modelHouse/', file.name)];
-   %command = [command strcat('TeddyBearPNG/', file.name)];
+   %command = [command strcat('modelHouse/', file.name)];
+   command = [command strcat('TeddyBearPNG/', file.name)];
 
 
    %command = strcat(command, ' -sift');

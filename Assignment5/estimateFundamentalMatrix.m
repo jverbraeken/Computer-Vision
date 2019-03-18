@@ -64,25 +64,23 @@ function [bestF, bestinliers] = estimateFundamentalMatrix(match1, match2)
             % Find the final set of inliers
             inliers = computeInliers(F,match1,match2,threshold);
             
-            %{
             % if number of inlier > the best so-far, use new F
             if size(inliers,2)>bestcount
-                bestcount   = ...
-                bestF       = ...
-                bestinliers = ...
+                bestcount   = size(inliers, 2);
+                bestF       = F;
+                bestinliers = inliers;
             end
             
             % Calculate how many iterations we need by computing:
             % i=log(t)/log(1-q^p),
             % where p=8 (the number of matches)
             % q= #inliers/#total_pairs (the proportion of inliers over total pairs)
-            eps = 0.001;
-            N1  = ...
-            N   = ... 
-            q   = ... 
+            %eps = 0.001;
+            %N1  = ...
+            %N   = ...
+            q   = inliers / size(perm);
             % To prevent special cases, always run at least a couple of times
-            iterations = max(miniter, ceil( ... ));
-            %}
+            iterations = max(miniter, ceil(q));
         end
         i = i+1;
         
