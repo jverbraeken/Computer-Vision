@@ -9,7 +9,7 @@ function F = demo_lab5()
     img1 = im2double(rgb2gray(imread('TeddyBearPNG/obj02_001.png')));
     img2 = im2double(rgb2gray(imread('TeddyBearPNG/obj02_002.png')));
 
-    % Load Features and Descriptors (provided by TAs)
+    % Load Features and DesN1criptors (provided by TAs)
     % you can also extract those features using the Harris/Hessian Affine 
     % implementation which can be downloaded from http://www.robots.ox.ac.uk/~vgg/research/affine/detectors.html.
     [feat1,desc1,~,~] = loadFeatures('TeddyBearPNG/obj02_001.png.harhes.sift');

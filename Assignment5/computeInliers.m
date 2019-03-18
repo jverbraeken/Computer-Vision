@@ -11,10 +11,10 @@ function inliers = computeInliers(F, match1, match2, threshold)
     % Compute numerator and denominator at first
     numer = zeros(1,length(match1));
     for i = 1:length(numer)
-        numer(i) = match2(:,i)' * F * match1(:,i);
+        numer(i) = (match2(:,i)' * F * match1(:,i)).^2;
     end
     a = (F * match1).^2;
-    b = (F' * match1).^2;
+    b = (F' * match2).^2;
     denom = a(1,:) + a(2,:) + b(1,:) + b(2,:);
     sd    = numer./denom;
 

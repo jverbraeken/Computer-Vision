@@ -28,7 +28,7 @@ function [bestF, bestinliers] = estimateFundamentalMatrix(match1, match2)
     threshold = 50;
 
     % How many points are needed for the Fundamental matrix?
-    p = 16;
+    p = 8;
 
     % Start iterations
     i=0;
@@ -50,12 +50,11 @@ function [bestF, bestinliers] = estimateFundamentalMatrix(match1, match2)
         
         % Find inliers by computing perpendicular errors between the points 
         % and the epipolar lines in each image
-        threshold = 10;  % TODO tune parameter
         inliers = computeInliers(F,match1,match2,threshold);
         
         % Check if the number of inliers is larger than 8
         % If yes, use those inliners to re-estimate (re-fine) F.    
-        if size(inliers,1)>=8
+        if size(inliers,2)>=8
             % Normalize previously found inliers
             [X1,T1] = normalize(match1(1:2, inliers));
             [X2,T2] = normalize(match2(1:2, inliers));
