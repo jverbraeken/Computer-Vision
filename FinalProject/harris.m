@@ -54,7 +54,7 @@ function [r, c, sigmas] = harris(im, loc, thres)
 
    
     % Set the threshold 
-    threshold = thres * max(R(:,:,1), [], 'all');
+    threshold = thres * max(R(:,:,1), [], 'omitnan');
 
     % Find local maxima
     % Dilation will alter every pixel except local maxima in a 3x3 square area.

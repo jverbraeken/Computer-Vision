@@ -10,15 +10,12 @@ disp("----");
 %% 1st step: Find correspondences between consecutive matching
 disp("1st step: Find correspondences between consecutive matching");
 
-ind = randi(size(I, 4), 1, 1);
+ind = randi(size(I, 3), 1, 1);
+ind2 = mod(ind-1, size(I, 3)) + 1;  % ind2 = (ind != size(I, 3)) ? ind : 1
 dist_thres = 0.8;
 edge_thres = 0.1;
 mode = 'own';
-if (ind == size(I, 4))
-    [match1, match2] = findMatches(I(:,:, ind), I(:,:,1), dist_thres, edge_thres, mode);
-else
-    [match1, match2] = findMatches(I(:,:,ind), I(:,:,ind+1), dist_thres, edge_thres, mode);
-end
+[match1, match2] = findMatches(I(:, :, ind), I(:, :, ind2), dist_thres, edge_thres, mode);
 
 disp("----");
 %% 2nd step: Apply normalized 8-point RANSAC algorithm to find best matches
