@@ -3,7 +3,7 @@
 %
 % Input: 
 %           - match1: matched points from the first images
-%           - match２: matched points from the second images
+%           - match2: matched points from the second images
 % Output: 
 %           - bestF: estimated F 
 %           - bestinliers: inliers found
@@ -80,7 +80,6 @@ function [bestF, bestinliers] = estimateFundamentalMatrix(match1, match2)
             % q= #inliers/#total_pairs (the proportion of inliers over total pairs)
             eps = 0.001;
             q   = bestcount/length(match1);
-            %N1  = ...
             N   = log10(eps)/log10(1 - q^p);
             % To prevent special cases, always run at least a couple of times
             iterations = max(miniter, ceil( N ));
