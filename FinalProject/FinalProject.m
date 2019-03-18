@@ -26,13 +26,38 @@ disp("----");
 %% 3rd step: Represent point correspondes for different camera views
 disp("3rd step: Represent point correspondes for different camera views");
 
+% Lab assignment 6
+
 disp("----");
 %% 4th step: Stitch points together
 disp("4th step: Stitch points together");
 
+% TODO, depends on assignment 6
+% M = ...
+% S = ...
+% save('M','M')
+
 disp("----");
 %% 5th step: Eliminate affine ambiguity
 disp("5th step: Eliminate affine ambiguity");
+
+% Eliminate the affine ambiguity
+% Orthographic: We need to impose that image axes (a1 and a2) are perpendicular and their scale is 1.
+% (a1: col vector, projection of x; a2: row vector, projection of y;,)
+% We define the starting value for L, L0 as: A1 L0 A1' = Id 
+A1 = M(1:2, :);
+L0 = pinv(A1' * A1);
+
+% We solve L by iterating through all images and finding L one which minimizes Ai*L*Ai' = Id, for all i.
+% LSQNONLIN solves non-linear least squares problems. Please check the Matlab documentation.
+L = lsqnonlin(@residuals, L0);
+
+% Recover C from L by Cholesky decomposition.
+C = chol(L,'lower');
+
+% Update M and S with the corresponding C form: M = MC and S = C^{-1}S. 
+M = M * C;
+S = pinv(C) * S;
 
 disp("----");
 %% 6th step: Plot 3D model
