@@ -19,7 +19,7 @@ switch mode
        
     otherwise
         % Find features and make descriptor of image 1
-        loc1                  = DoG(im1, 0.01);
+        loc1                  = DoG(im1, 0.8);
         [r1, c1, sigma1]      = harris(im1, loc1, thres);
         orient1               = zeros(size(sigma1));
         % Pay attention to the oder of parameters [c',r'] (equal to [x,y])

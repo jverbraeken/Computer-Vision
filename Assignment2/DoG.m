@@ -15,19 +15,16 @@ function loc = DoG(im,tf)
 
     % Prior smoothing sigma
     sigmaP = 1.6;
-    levels = 3;
+    levels = 5;
     
     % Scaling factor
     k = 2^(1/levels);
-    noOctaves = 4;
+    noOctaves = 3;
 
     GP = cell(levels+3,1);
     for i = 1:levels+3
         GP{i} = gaussian( sigmaP*(k^(i-2)) ); % TODO: you could use your own 
     end
-
-    % We start from a larger image
-    im2 = imresize(im,2);
 
     % For all octaves
     for octave = 1:noOctaves
@@ -36,11 +33,7 @@ function loc = DoG(im,tf)
         % Create the levels in the scale-space
         imG = cell(levels+3,1);
         for i = 1:levels+3
-            if octave == 1                
-                imG{i} = conv2(GP{i},GP{i},im2,'same');
-            else
-                imG{i} = conv2(GP{i},GP{i},im,'same');
-            end
+            imG{i} = conv2(GP{i},GP{i},im,'same');
         end
         
         % Computer the DoG (Difference of Gaussians)
