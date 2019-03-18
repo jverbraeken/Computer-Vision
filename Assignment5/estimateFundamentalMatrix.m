@@ -24,6 +24,8 @@ function [bestF, bestinliers] = estimateFundamentalMatrix(match1, match2)
 
     % Minimum of iterations
     miniter = 5;
+    
+    threshold = 50;
 
     % How many points are needed for the Fundamental matrix?
     p = 16;
@@ -52,10 +54,10 @@ function [bestF, bestinliers] = estimateFundamentalMatrix(match1, match2)
         
         % Check if the number of inliers is larger than 8
         % If yes, use those inliners to re-estimate (re-fine) F.    
-        if size(inliers,2)>=8
+        if size(inliers,1)>=8
             % Normalize previously found inliers
-            [X1,T1] = normalize();
-            [X2,T2] = normalize();
+            [X1,T1] = normalize(match1(1:2, inliers));
+            [X2,T2] = normalize(match2(1:2, inliers));
             
             % Use inliers to re-estimate F
             A = composeA(X1, X2);
@@ -64,12 +66,12 @@ function [bestF, bestinliers] = estimateFundamentalMatrix(match1, match2)
             % Find the final set of inliers
             inliers = computeInliers(F,match1,match2,threshold);
             
-            %{
+            
             % if number of inlier > the best so-far, use new F
             if size(inliers,2)>bestcount
-                bestcount   = ...
-                bestF       = ...
-                bestinliers = ...
+                bestcount   = length(inliers);
+                bestF       = F;
+                bestinliers = inliers;
             end
             
             % Calculate how many iterations we need by computing:
@@ -77,12 +79,12 @@ function [bestF, bestinliers] = estimateFundamentalMatrix(match1, match2)
             % where p=8 (the number of matches)
             % q= #inliers/#total_pairs (the proportion of inliers over total pairs)
             eps = 0.001;
-            N1  = ...
-            N   = ... 
-            q   = ... 
+            q   = bestcount/length(match1);
+            %N1  = ...
+            N   = log10(eps)/log10(1 - q^p);
             % To prevent special cases, always run at least a couple of times
-            iterations = max(miniter, ceil( ... ));
-            %}
+            iterations = max(miniter, ceil( N ));
+           
         end
         i = i+1;
         
