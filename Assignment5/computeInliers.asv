@@ -17,7 +17,7 @@ function inliers = computeInliers(F, match1, match2, threshold)
         denom = b(1)^2+b(2)^2+c(1)^2+c(2)^2;
         sd    = numer/denom;
         if sd < threshold
-            inliers = [inliers, i];
+            inliers = [inliers];
         end
     end
     

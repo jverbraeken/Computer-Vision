@@ -3,7 +3,7 @@
 %
 % Input: 
 %           - match1: matched points from the first images
-%           - match２: matched points from the second images
+%           - match2: matched points from the second images
 % Output: 
 %           - bestF: estimated F 
 %           - bestinliers: inliers found
@@ -48,15 +48,15 @@ function [bestF, bestinliers] = estimateFundamentalMatrix(match1, match2)
         
         % Find inliers by computing perpendicular errors between the points 
         % and the epipolar lines in each image
-        threshold = 10;  % TODO tune parameter
+        threshold = 50;  % TODO tune parameter
         inliers = computeInliers(F,match1,match2,threshold);
         
         % Check if the number of inliers is larger than 8
         % If yes, use those inliners to re-estimate (re-fine) F.    
         if size(inliers,2)>=8
             % Normalize previously found inliers
-            [X1,T1] = normalize();
-            [X2,T2] = normalize();
+            [X1,T1] = normalize(match1(1:2, inliers));
+            [X2,T2] = normalize(match2(1:2, inliers));
             
             % Use inliers to re-estimate F
             A = composeA(X1, X2);
@@ -79,7 +79,7 @@ function [bestF, bestinliers] = estimateFundamentalMatrix(match1, match2)
             %eps = 0.001;
             %N1  = ...
             %N   = ...
-            q   = inliers / size(perm);
+            q   = size(inliers, 2) / size(match1, 2);
             % To prevent special cases, always run at least a couple of times
             iterations = max(miniter, ceil(q));
         end

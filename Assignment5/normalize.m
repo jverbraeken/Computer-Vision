@@ -9,7 +9,7 @@
 function [Xout, T] = normalize( X )
 
     % Compute Xmean: normalize all X in each image to have 0-mean
-    Xmean =  mean(X, 2);
+    Xmean = mean(X, 2);
 
     % Compute d: scale all X so that the average distance to the mean is sqrt(2).
     % Check the lab file for details.
