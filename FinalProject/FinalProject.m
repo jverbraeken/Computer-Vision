@@ -1,4 +1,6 @@
 % Final Project
+addpath("../Assignment3");
+addpath("../Assignment5");
 
 %% 0nd step: Read the images and resize
 disp("0nd step: Read the images and resize");
