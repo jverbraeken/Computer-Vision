@@ -1,11 +1,13 @@
 % Final Project
 
 %% 0nd step: Read the images and resize
+disp("0nd step: Read the images and resize");
 
 I = imageParser('model_castle', 'JPG');
 I = imresize(I, 0.5);  % Prevent Out-of-Memory exception
 
 %% 1st step: Find correspondences between consecutive matching
+disp("1st step: Find correspondences between consecutive matching");
 
 ind = randi(size(I, 4), 1, 1);
 dist_thres = 0.8;
@@ -18,11 +20,16 @@ else
 end
 
 %% 2nd step: Apply normalized 8-point RANSAC algorithm to find best matches
+disp("2nd step: Apply normalized 8-point RANSAC algorithm to find best matches");
 
 %% 3rd step: Represent point correspondes for different camera views
+disp("3rd step: Represent point correspondes for different camera views");
 
 %% 4th step: Stitch points together
+disp("4th step: Stitch points together");
 
 %% 5th step: Eliminate affine ambiguity
+disp("5th step: Eliminate affine ambiguity");
 
 %% 6th step: Plot 3D model
+disp("6th step: Plot 3D model");
