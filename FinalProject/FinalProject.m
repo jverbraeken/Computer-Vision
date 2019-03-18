@@ -63,4 +63,6 @@ disp("----");
 %% 6th step: Plot 3D model
 disp("6th step: Plot 3D model");
 
+plot3(S(1,:),S(2,:),S(3,:),'.r');
+
 disp("----");
