@@ -1,10 +1,7 @@
-% This function incorporates all the required steps for the final project. 
-% Please pay attention to expected data formats and data sizes.
-
 function [] = reconstruction_demo()
 
     % Open the specified folder and read images. 
-    directory = ... % Path to your local image directory 
+    directory = "TeddyBearPNG"; % Path to your local image directory 
     Files=dir(strcat(directory, '*.png'));
     n = length(Files);
 
@@ -35,7 +32,7 @@ function [] = reconstruction_demo()
     % Stitch every 3 images together to create a point cloud.
     Clouds = {};
     i = 1;
-    numFrames=3;
+    numFrames = 3;
 
     for iBegin = 1:n-(numFrames - 1)
         iEnd = ...
