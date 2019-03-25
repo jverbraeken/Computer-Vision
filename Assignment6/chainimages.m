@@ -37,10 +37,10 @@ function [PV] = chainimages(matches)
         else
             % Find already found points using intersection on PV(i,:) and newmatches 
             [~, IA, IB] = intersect(PV(i, :), newmatches);
-            PV(i+1, IA) = newmatches(2,IB);
+            PV(i+1, IA) = newmatches(IB);
             
             % Find new matching points that are not in the previous match set using setdiff.
-            [diff, IA] = setdiff(newmatches , PV(i+1, :));
+            [diff, IA] = setdiff(newmatches, PV(i+1, :));
             
             % Grow the size of the point view matrix each time you find a new match.
             start = size(PV,2)+1;
