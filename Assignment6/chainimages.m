@@ -36,7 +36,7 @@ function [PV] = chainimages(matches)
         else
             % Find already found points using intersection on PV(i,:) and newmatches 
             [~, IA, IB] = intersect(PV(i, :), PV(i+1, :));
-            PV(i+1, :) = intersection(IA, newmatches);
+            PV(i+1, :) = intersection(IA, IB);
             
             % Find new matching points that are not in the previous match set using setdiff.
             [diff, IA] = setdiff(newmatches , PV(i+1, :));

@@ -18,11 +18,11 @@ function [C, D, Matches] = ransac_match(directory)
     % You can also use features extracted from your own Harris function.
     for i=1:n
         disp('image num');
-        i
+        
         [coord_haraff,desc_haraff,~,~] = loadFeatures(strcat(directory, '/',Files(i).name, '.haraff.sift'));
         [coord_hesaff,desc_hesaff,~,~] = loadFeatures(strcat(directory, '/',Files(i).name, '.hesaff.sift'));
         
-        coord= [coord_haraff coord_hesaff];
+        coord = [coord_haraff coord_hesaff];
         desc = [desc_haraff desc_hesaff];
         
         C{i} = coord(1:2, :);
@@ -33,8 +33,7 @@ function [C, D, Matches] = ransac_match(directory)
     Matches={};
 
     for i=1:n
-        
-        next = ...
+        next = i+1;
         
         coord1 = C{i};
         desc1  = D{i};
@@ -42,14 +41,14 @@ function [C, D, Matches] = ransac_match(directory)
         coord2 = C{next};
         desc2  = D{next};
         
-        disp('Matching Descriptors');drawnow('update')
+        disp('Matching Descriptors'); drawnow('update')
         % Find matches according to extracted descriptors using vl_ubcmatch
-        [] = vl_ubcmatch( ..  ,  ..);
-        disp(strcat( int2str(size(match,2)), ' matches found'));drawnow('update')
+        match = vl_ubcmatch(desc1, desc2);
+        disp(strcat( int2str(size(match, 2)), ' matches found')); drawnow('update')
         
         % Obatain X,Y coordinates of matches points
-        match1 = ...
-        match2 = ...
+        match1 = coord1(match);
+        match2 = coord2(match);
         
         % Find inliers using normalized 8-point RANSAC algorithm
         [~, inliers] = estimateFundamentalMatrix(match1,match2);
