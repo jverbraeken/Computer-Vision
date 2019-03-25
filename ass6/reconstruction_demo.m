@@ -4,7 +4,7 @@
 function [] = reconstruction_demo()
 
     % Open the specified folder and read images. 
-    directory = './TeddyBearPNG/'% Path to your local image directory 
+    directory = './TeddyBearPNG/';  % Path to your local image directory 
     Files=dir(strcat(directory, '*.png'));
     n = length(Files);
 
@@ -15,8 +15,8 @@ function [] = reconstruction_demo()
         load(strcat(directory, 'Matches.mat'));
         load(strcat(directory, 'C.mat'));
     else
-        [C, D, Matches] = ransac_match(directory) 
-        save(strcat(directory, 'Matches.mat'), 'Matches');
+        [C, D, matches] = ransac_match(directory); 
+        save(strcat(directory, 'Matches.mat'), 'matches');
         save(strcat(directory, 'C.mat'), 'C');
     end
 
@@ -26,11 +26,11 @@ function [] = reconstruction_demo()
     if exist(strcat(directory, 'PV.mat'))
         load(strcat(directory, 'PV.mat'));
     else
-        [PV] = chainimages(Matches);
+        [PV] = chainimages(matches);
         save(strcat(directory, 'PV.mat'), 'PV');
     end
 
-%{
+
     % Stitching: with affine Structure from Motion
     % Stitch every 3 images together to create a point cloud.
     Clouds = {};
@@ -38,16 +38,17 @@ function [] = reconstruction_demo()
     numFrames=3;
 
     for iBegin = 1:n-(numFrames - 1)
-        iEnd = ...
+        iEnd = iBegin + 2; 
         
         % Select frames from the PV matrix to form a block
-        block = ...
+        block = PV(iBegin:iEnd, :);
         
         % Select columns from the block that do not have any zeros
-        colInds = find(...);
+        zeroInds = block ~= 0;
+        colInds = find(zeroInds(1, :) .* zeroInds(2, :) .* zeroInds(3, :));
         
         % Check the number of visible points in all views
-        numPoints = size(colInds, 2);
+        numPoints = length(colInds);
         if numPoints < 8
             continue
         end
@@ -58,17 +59,19 @@ function [] = reconstruction_demo()
         block = block(:, colInds);
         X = zeros(2 * numFrames, numPoints);
         for f = 1:numFrames
-            for p = 1:numPoints
-                
-                X(2 * f - 1, p) = ...
-                X(2 * f, p)     = ... 
-            end
+            %for p = 1:numPoints
+                coord = C{i};
+                X(2 * f - 1, :) = coord(1, block(i, :));
+                X(2 * f, :)     = coord(2, block(i, :));
+            %end
         end
+        
+        save(strcat(directory, 'X.mat'), 'X');
         
         % Estimate 3D coordinates of each block following Lab 4 "Structure from Motion" to compute the M and S matrix.
         % Here, an additional output "p" is added to deal with the non-positive matrix error
         % Please check the chol function inside sfm.m for detail.
-        [M, S, p] = ... % Your structure from motion implementation for the measurements X
+        [M, S, p] = sfm(directory);     % Your structure from motion implementation for the measurements X
 
         if ~p
             % Compose Clouds in the form of (M,S,colInds)
@@ -76,7 +79,7 @@ function [] = reconstruction_demo()
             i = i + 1;
         end
     end
-
+%{
     % By an iterative manner, stitch each 3D point set to the main view using the point correspondences i.e., finding optimal
     % transformation between shared points in your 3D point clouds. 
 
