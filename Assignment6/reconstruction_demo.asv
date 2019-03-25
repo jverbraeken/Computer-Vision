@@ -58,8 +58,8 @@ function [] = reconstruction_demo()
         for f = 1:numFrames
             for p = 1:numPoints
                 
-                X(2 * f - 1, p) = block(f-1, p);
-                X(2 * f, p)     = block(f, p);
+                X(2 * f - 1, p) = block(
+                X(2 * f, p)     = ... 
             end
         end
         

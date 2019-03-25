@@ -33,7 +33,7 @@ function [C, D, Matches] = ransac_match(directory)
     Matches={};
 
     for i=1:n
-        next = i+1;
+        next = mod(i, n)+1;
         
         coord1 = C{i};
         desc1  = D{i};
@@ -47,11 +47,11 @@ function [C, D, Matches] = ransac_match(directory)
         disp(strcat( int2str(size(match, 2)), ' matches found')); drawnow('update')
         
         % Obatain X,Y coordinates of matches points
-        match1 = coord1(match);
-        match2 = coord2(match);
+        match1 = coord1(1:2, match(1, :));
+        match2 = coord2(1:2, match(2, :));
         
         % Find inliers using normalized 8-point RANSAC algorithm
-        [~, inliers] = estimateFundamentalMatrix(match1,match2);
+        [~, inliers] = estimateFundamentalMatrix(match1', match2');
         drawnow('update')
         Matches{i} = match(:,inliers);
         
