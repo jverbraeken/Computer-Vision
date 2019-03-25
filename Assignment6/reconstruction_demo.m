@@ -105,7 +105,7 @@ function [] = reconstruction_demo()
         % T.c is a repeated 3D offset, so resample it to have the correct size
         c = T.c(ones(size(iCloudsNew,2),1),:);
 
-        % Transform the new points using: Z = T.b * T * T.T + T.c.
+        % Transform the new points using: Z = (T.b * T' * T.T + T.c)'.
         % and store them in the merged cloud, and add their indexes to merged set
         mergedCloud(:, iNew) = ...
         mergedInds           = ...
