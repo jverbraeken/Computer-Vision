@@ -31,25 +31,19 @@ function [PV] = chainimages(matches)
     %  Starting from the first frame
     for i = 2:frames
         newmatches = matches{i};
-        
-        % For the first pair, simply add the indices of matched points to the same
-        % column of the first two rows of the point-view matrix.
-        if i==1
-            PV(1:2,:) = newmatches;
-        else
-            % Find already found points using intersection on PV(i,:) and newmatches 
-            [~, IA, IB]  = intersect(newmatches, PV(i, :));
-            PV(i+1, newmatches(IA)) = PV(i, IB);
-            
-            % Find new matching points that are not in the previous match set using setdiff.
-            [diff, ~] = setdiff(newmatches, PV(i, :));
-            
-            % Grow the size of the point view matrix each time you find a new match.
-            start = size(PV,2)+1;
-            PV    = [PV zeros(frames+1, length(diff))]; 
-            PV(i, start:end)   = diff;
-            PV(i+1, start:end) = diff;
-        end
+    
+        % Find already found points using intersection on PV(i,:) and newmatches 
+        [~, IA, IB]  = intersect(newmatches(1, :), PV(i, :));
+        PV(i+1, IB) = newmatches(2, IA);
+
+        % Find new matching points that are not in the previous match set using setdiff.
+        [~, IA] = setdiff(newmatches(1, :), PV(i, :));
+
+        % Grow the size of the point view matrix each time you find a new match.
+        start = size(PV,2)+1;
+        PV    = [PV zeros(frames+1, length(IA))]; 
+        PV(i, start:end)   = newmatches(1, IA);
+        PV(i+1, start:end) = newmatches(2, IA);
     end
 
     % Process the last frame-pair. This part is already completed by TAs.

@@ -25,7 +25,7 @@ function [bestF, bestinliers] = estimateFundamentalMatrix(match1, match2)
     % Minimum of iterations
     miniter = 5;
     
-    threshold = 50;
+    threshold = 10;
 
     % How many points are needed for the Fundamental matrix?
     p = 8;

@@ -17,7 +17,7 @@ M = M.M;
 diff = zeros(size(M,1)/2,4);
 
 % Compute the residuals
-for i = 1:size(M, 2)/2 % Loop over the cameras
+for i = 1:size(M, 1)/2 % Loop over the cameras
 
     % Define the x and y projections: 
     Ai = M(i*2-1 : i*2, :); 
