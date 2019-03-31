@@ -19,8 +19,6 @@ function [] = reconstruction_demo()
         save(strcat(directory, 'Matches.mat'), 'matches');
         save(strcat(directory, 'C.mat'), 'C');
     end
-    
-    matches = matches2;
 
     % Chaining: Create point-view matrix (PV) to represent point correspondences 
     % for different camera views (Lab assignment 6).
@@ -40,7 +38,7 @@ function [] = reconstruction_demo()
     numFrames=3;
 
     for iBegin = 1:n
-        iEnd = mod(iBegin + 2, n) ; 
+        iEnd = mod(iBegin + 2, n); 
         
         % Select frames from the PV matrix to form a block
         if iBegin < iEnd
