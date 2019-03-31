@@ -1,6 +1,7 @@
 % Final Project
 addpath("../Assignment3");
 addpath("../Assignment5");
+addpath("../Assignment6");
 
 %% 0nd step: Read the images and resize
 disp("0nd step: Read the images and resize");
@@ -24,7 +25,7 @@ disp("----");
 disp("2nd step: Apply normalized 8-point RANSAC algorithm to find best matches");
 [F, inliers] = estimateFundamentalMatrix(X1,X2);
 
-disp("----");
+disp("----");   
 %% 3rd step: Represent point correspondes for different camera views
 disp("3rd step: Represent point correspondes for different camera views");
 
