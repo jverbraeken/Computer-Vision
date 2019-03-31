@@ -141,6 +141,7 @@ function [] = reconstruction_demo()
 
 
     % 3D Model Plotting (surfaceRender):
+    surfaceRender(mergedCloud, M1, MeanFrame1, 0);  % TODO get image
     % When you have the 3D point cloud of the moodel, use the built-in surf
     % function for the 3D surface plot. Then include RGB (texture) colour of
     % the related points on surf visualization (interpolate colour values for

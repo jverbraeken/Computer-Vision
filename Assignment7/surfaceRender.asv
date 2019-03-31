@@ -64,7 +64,7 @@ function [] = surfaceRender(pointcloud, M, Mean, img)
     qzrow = zeros(numel(qz));
 
     % Transform to the main view using the corresponding motion / transformation matrix, M
-    q_xy = [qxrow * M; qyrow * M];
+    q_xy = 
 
     % All transformed points are normalized by mean values in advance, we have to move
     % them to the correct positions by adding corresponding mean values of each dimension.
