@@ -4,15 +4,15 @@
 function [] = reconstruction_demo()
 
     % Open the specified folder and read images. 
-    directory = 'TeddyBearPNG\';  % Path to your local image directory 
+    directory = './TeddyBearPNG/';  % Path to your local image directory 
     Files=dir(strcat(directory, '*.png'));
     n = length(Files);
 
     % Apply normalized 8-point RANSAC algorithm to find best matches. (Lab assignment 3+5)
     % The output includes cell arrays with Coordinates (C), Descriptors (D) and indies (Matches)for all matched pairs.
     disp('ransac_match');
-    if exist(strcat(directory, 'Matches3.mat')) && exist(strcat(directory, 'C.mat'))
-        load(strcat(directory, 'Matches3.mat'));
+    if exist(strcat(directory, 'Matches.mat')) && exist(strcat(directory, 'C.mat'))
+        load(strcat(directory, 'Matches.mat'));
         load(strcat(directory, 'C.mat'));
     else
         [C, D, matches] = ransac_match(directory); 
@@ -125,8 +125,7 @@ function [] = reconstruction_demo()
         mergedInds           = [mergedInds iNew];
     end
 
-    im0 = imread(strcat(directory, 'obj02_001.png'));
-    surfaceRender(mergedCloud, M1, MeanFrame1, im0);
+    mergedCloud(3,:) = mergedCloud(3,:) * (-1);
     
     % Plot the full merged cloud
     % Helpful for debugging and visualizing your reconstruction
