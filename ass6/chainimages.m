@@ -25,7 +25,7 @@ function [PV] = chainimages(matches)
     % This extra row will be deleted at the end.
     %PV = zeros(frames+1,0);
     newmatches = matches{1};
-    PV = zeros(frames+1, length(newmatches));
+    PV = zeros(frames+1, size(newmatches, 2));
     PV(1:2, :) = newmatches;
 
     %  Starting from the first frame
@@ -37,12 +37,12 @@ function [PV] = chainimages(matches)
         PV(i+1, IB) = newmatches(2, IA);
 
         % Find new matching points that are not in the previous match set using setdiff.
-        [~, IA] = setdiff(newmatches(1, :), PV(i, :));
+        [diff, IA] = setdiff(newmatches(1, :), PV(i, :));
 
         % Grow the size of the point view matrix each time you find a new match.
         start = size(PV,2)+1;
-        PV    = [PV zeros(frames+1, length(IA))]; 
-        PV(i, start:end)   = newmatches(1, IA);
+        PV    = [PV zeros(frames+1, size(diff, 2))]; 
+        PV(i, start:end)   = diff;
         PV(i+1, start:end) = newmatches(2, IA);
     end
 

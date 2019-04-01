@@ -39,6 +39,12 @@ function [] = surfaceRender(pointcloud, M, Mean, img)
     % Remove the points where the dot product between the mean subtracted points
     % (given by ‘X0 - Xm’) and the viewing direction is negative
     indices = find(dot(X0 - Xm, X1) < 0);
+    X1 = repmat(viewdir, 1, length(X));
+    Xm = repmat(m, 1, length(X));
+
+    % Remove the points where the dot product between the mean subtracted points
+    % (given by ‘X0 - Xm’) and the viewing direction is negative
+    indices = (dot(X0 - Xm, X1) < 0);
     X(indices) = [];
     Y(indices) = [];
     Z(indices) = [];
@@ -59,17 +65,17 @@ function [] = surfaceRender(pointcloud, M, Mean, img)
 
 
     % Reshape (qx,qy,qz) to row vectors for next step
-    qxrow = reshape(qx, [], 1);
-    qyrow = reshape(qy, [], 1);
-    qzrow = reshape(qz, [], 1);
+    qxrow = reshape(qx, [numel(qx), 1]); 
+    qyrow = reshape(qy, [numel(qy), 1]);
+    qzrow = reshape(qz, [numel(qz), 1]);
 
     % Transform to the main view using the corresponding motion / transformation matrix, M
     q_xy = [qxrow qyrow] * M;
 
     % All transformed points are normalized by mean values in advance, we have to move
     % them to the correct positions by adding corresponding mean values of each dimension.
-    q_x = q_xy(1, :) + Mean(1);
-    q_y = q_xy(2, :) + Mean(2);
+    q_x = q_xy(:, 1) + Mean(1);
+    q_y = q_xy(:, 2) + Mean(2);
 
     % Remove NaN values in q_x and q_y
     q_x(isnan(q_x))=1;
@@ -89,6 +95,7 @@ function [] = surfaceRender(pointcloud, M, Mean, img)
         Cr = imgr(sub2ind(size(imgr), round(q_x), round(q_y)));
         Cg = imgg(sub2ind(size(imgg), round(q_x), round(q_y)));
         Cb = imgb(sub2ind(size(imgb), round(q_x), round(q_y)));
+
  
         qc(:,:,1) = reshape(Cr,size(qx));
         qc(:,:,2) = reshape(Cg,size(qy));

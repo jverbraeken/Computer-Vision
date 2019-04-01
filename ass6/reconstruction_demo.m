@@ -11,8 +11,8 @@ function [] = reconstruction_demo()
     % Apply normalized 8-point RANSAC algorithm to find best matches. (Lab assignment 3+5)
     % The output includes cell arrays with Coordinates (C), Descriptors (D) and indies (Matches)for all matched pairs.
     disp('ransac_match');
-    if exist(strcat(directory, 'Matches3.mat')) && exist(strcat(directory, 'C.mat'))
-        load(strcat(directory, 'Matches3.mat'));
+    if exist(strcat(directory, 'Matches.mat')) && exist(strcat(directory, 'C.mat'))
+        load(strcat(directory, 'Matches.mat'));
         load(strcat(directory, 'C.mat'));
     else
         [C, D, matches] = ransac_match(directory); 

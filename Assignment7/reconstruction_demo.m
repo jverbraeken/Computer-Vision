@@ -125,6 +125,9 @@ function [] = reconstruction_demo()
         mergedInds           = [mergedInds iNew];
     end
 
+    im0 = imread(strcat(directory, 'obj02_001.png'));
+    surfaceRender(mergedCloud, M1, MeanFrame1, im0);
+    
     % Plot the full merged cloud
     % Helpful for debugging and visualizing your reconstruction
     X = mergedCloud(1,:)';
@@ -141,13 +144,15 @@ function [] = reconstruction_demo()
 
 
     % 3D Model Plotting (surfaceRender):
+
     img1 = imread(strcat(directory, 'obj02_001.png'));
     surfaceRender(mergedCloud, M1, MeanFrame1, img1);  % TODO get image
+
     % When you have the 3D point cloud of the moodel, use the built-in surf
     % function for the 3D surface plot. Then include RGB (texture) colour of
     % the related points on surf visualization (interpolate colour values for
     % the filled areas on the surface using the known points). 
     % Students are supposed to implement this in a clever way (by using built-in
     % Matlab functions).
-%}
+
 end
