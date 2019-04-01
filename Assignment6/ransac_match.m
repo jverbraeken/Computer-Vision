@@ -19,8 +19,8 @@ function [C, D, Matches] = ransac_match(directory)
     for i= 1:n
         disp('image num');
         %i
-        [coord_haraff,desc_haraff,~,~] = loadFeatures(strcat(directory, '/',Files(i).name, '.haraff.sift'));
-        [coord_hesaff,desc_hesaff,~,~] = loadFeatures(strcat(directory, '/',Files(i).name, '.hesaff.sift'));
+        [coord_haraff,desc_haraff,~,~] = loadFeatures(strcat(directory, Files(i).name, '.haraff.sift'));
+        [coord_hesaff,desc_hesaff,~,~] = loadFeatures(strcat(directory, Files(i).name, '.hesaff.sift'));
         
         coord   = [coord_haraff coord_hesaff];
         desc    = [desc_haraff desc_hesaff];
@@ -43,7 +43,7 @@ function [C, D, Matches] = ransac_match(directory)
         desc2  = D{next};
         
         disp('Matching Descriptors'); drawnow('update')
-        i,next
+        
         % Find matches according to extracted descriptors using vl_ubcmatch
         match = vl_ubcmatch(desc1,  desc2);
         disp(strcat( int2str(size(match,2)), ' matches found'));drawnow('update')

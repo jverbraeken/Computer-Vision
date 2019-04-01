@@ -5,7 +5,7 @@ function [] = reconstruction_demo()
 
     % Open the specified folder and read images. 
     directory = './TeddyBearPNG/';  % Path to your local image directory 
-    Files=dir(strcat(directory, '*.png'));
+    Files = dir(strcat(directory, '*.png'));
     n = length(Files);
 
     % Apply normalized 8-point RANSAC algorithm to find best matches. (Lab assignment 3+5)
@@ -15,7 +15,7 @@ function [] = reconstruction_demo()
         load(strcat(directory, 'Matches.mat'));
         load(strcat(directory, 'C.mat'));
     else
-        [C, D, matches] = ransac_match(directory); 
+        [C, ~, matches] = ransac_match(directory); 
         save(strcat(directory, 'Matches.mat'), 'matches');
         save(strcat(directory, 'C.mat'), 'C');
     end

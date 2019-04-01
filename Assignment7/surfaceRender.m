@@ -26,7 +26,7 @@ function [] = surfaceRender(pointcloud, M, Mean, img)
     % % % with a direction given by the right-hand rule and a magnitude 
     % % % equal to the area of the parallelogram that the vectors span.
     viewdir = cross(M(1,:), M(2,:));
-    viewdir = viewdir / sum(viewdir); % sum(viewdir)=1
+    viewdir = viewdir / sum(abs(viewdir)); % sum(abs(viewdir))=1
     viewdir = viewdir';
     
     % % Centre point cloud around zero and use dot product to remove points
@@ -38,7 +38,7 @@ function [] = surfaceRender(pointcloud, M, Mean, img)
 
     % Remove the points where the dot product between the mean subtracted points
     % (given by ‘X0 - Xm’) and the viewing direction is negative
-    indices = (dot(X0 - Xm, X1) < 0);
+    indices = find(dot(X0 - Xm, X1) < 0);
     X(indices) = [];
     Y(indices) = [];
     Z(indices) = [];
@@ -80,7 +80,7 @@ function [] = surfaceRender(pointcloud, M, Mean, img)
 
     figure(2);
 
-    if(size(img,3)==3)
+    if (size(img,3) == 3)
         % Select the corresponding r,g,b image channels
         imgr = img(:, :, 1);
         imgg = img(:, :, 2);
@@ -91,7 +91,6 @@ function [] = surfaceRender(pointcloud, M, Mean, img)
         Cg = imgg(sub2ind(size(imgg), round(q_y), round(q_x)));
         Cb = imgb(sub2ind(size(imgb), round(q_y), round(q_x)));
 
- 
         qc(:,:,1) = reshape(Cr,size(qx));
         qc(:,:,2) = reshape(Cg,size(qy));
         qc(:,:,3) = reshape(Cb,size(qz));
@@ -106,7 +105,7 @@ function [] = surfaceRender(pointcloud, M, Mean, img)
     surf(qx, qy, qz, qc);
      
     % Render parameters
-    axis( [-500 500 -500 500 -500 500] );
+    axis([-500 500 -500 500 -500 500]);
     daspect([1 1 1]);
     rotate3d;
 

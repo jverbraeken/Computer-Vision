@@ -26,7 +26,7 @@ function [] = surfaceRender(pointcloud, M, Mean, img)
     % % % with a direction given by the right-hand rule and a magnitude 
     % % % equal to the area of the parallelogram that the vectors span.
     viewdir = cross(M(1,:), M(2,:));
-    viewdir = viewdir / sum(viewdir); % sum(viewdir)=1
+    viewdir = viewdir / sum(abs(viewdir)); % sum(abs(viewdir))=1
     viewdir = viewdir';
     
     % % Centre point cloud around zero and use dot product to remove points
@@ -38,20 +38,20 @@ function [] = surfaceRender(pointcloud, M, Mean, img)
 
     % Remove the points where the dot product between the mean subtracted points
     % (given by ‘X0 - Xm’) and the viewing direction is negative
-    indices = find(dot(X0 - Xm, X1) < 0);
+    indices = (dot(X0 - Xm, X1) < 0);
     X(indices) = [];
     Y(indices) = [];
     Z(indices) = [];
 
     % Grid to create surface on using meshgrid.
     % You can define the size of the grid (e.g., -500:500) 
-    ti = [-500:500];
+    ti = -500:1:500;
     [qx, qy] = meshgrid(ti, ti);
 
     % Surface generation using TriScatteredInterp
     % You can also use scatteredInterpolant instead.
     % Please check the detailed usage of these functions
-    F  = TriScatteredInterp(X', Y', Z');
+    F  = scatteredInterpolant(X', Y', Z');
     qz = F(qx,qy); 
 
     % Note: qz contains NaNs because some points in Z direction may not defined
@@ -59,17 +59,18 @@ function [] = surfaceRender(pointcloud, M, Mean, img)
 
 
     % Reshape (qx,qy,qz) to row vectors for next step
-    qxrow = reshape(qx, [], 1);
-    qyrow = reshape(qy, [], 1);
-    qzrow = reshape(qz, [], 1);
+    %qxrow = reshape(qx, [numel(qx), 1]); 
+    qxrow = qx(:)';
+    qyrow = qy(:)';
+    qzrow = qz(:)';
 
     % Transform to the main view using the corresponding motion / transformation matrix, M
-    q_xy = [qxrow qyrow] * M;
+    q_xy = M * [qxrow; qyrow; qzrow];
 
     % All transformed points are normalized by mean values in advance, we have to move
     % them to the correct positions by adding corresponding mean values of each dimension.
-    q_x = q_xy(1, :) + Mean;
-    q_y = q_xy(2, :) + Mean;
+    q_x = q_xy(1, :) + Mean(1);
+    q_y = q_xy(2, :) + Mean(2);
 
     % Remove NaN values in q_x and q_y
     q_x(isnan(q_x))=1;
@@ -79,27 +80,31 @@ function [] = surfaceRender(pointcloud, M, Mean, img)
 
     figure(2);
 
-    if(size(img,3)==3)
+    if (size(img,3) == 3)
         % Select the corresponding r,g,b image channels
         imgr = img(:, :, 1);
         imgg = img(:, :, 2);
         imgb = img(:, :, 3);
 
         % Color selection from image according to (q_y, q_x) using sub2ind
-        Cr = imgr(sub2ind(size(imgr), min(round(q_x), round(q_y)));
-        Cg = imgg(sub2ind(size(imgg), round(q_x), round(q_y)));
-        Cb = imgb(sub2ind(size(imgb), round(q_x), round(q_y)));
- 
+        Cr = imgr(sub2ind(size(imgr), round(q_y), round(q_x)));
+        Cg = imgg(sub2ind(size(imgg), round(q_y), round(q_x)));
+        Cb = imgb(sub2ind(size(imgb), round(q_y), round(q_x)));
+
         qc(:,:,1) = reshape(Cr,size(qx));
         qc(:,:,2) = reshape(Cg,size(qy));
         qc(:,:,3) = reshape(Cb,size(qz));
     else 
         % If grayscale image, we only have 1 channel
-        C  = img(sub2ind(size(img, 1), round(q_x), round(q_y)));
+        C  = img(sub2ind(size(img, 1), round(q_y), round(q_x)));
         qc = reshape(C,size(qx));
         colormap gray
     end
 
+    qx(1:500, 1:500) = NaN;
+    qy(1:500, 1:500) = NaN;
+    qz(1:500, 1:500) = NaN;
+    qc(1:500, 1:500) = NaN;
     % Display surface
     surf(qx, qy, qz, qc);
      

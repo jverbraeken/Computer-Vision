@@ -20,12 +20,12 @@ function [bestF, bestinliers] = estimateFundamentalMatrix(match1, match2)
 
     % Initialize RANSAC parameters
     % Total iterations (e.g. 50)
-    iterations = 50;
+    iterations = 60;
 
     % Minimum of iterations
-    miniter = 5;
+    miniter = 6;
     
-    threshold = 50;
+    threshold = 100;
 
     % How many points are needed for the Fundamental matrix?
     p = 8;
