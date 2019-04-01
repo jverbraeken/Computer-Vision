@@ -141,7 +141,7 @@ function [] = reconstruction_demo()
 
 
     % 3D Model Plotting (surfaceRender):
-    img1 = imread(strcat(directory, 'obj02_001.png'));
+    img1 = imload(strcat(direct, "obj_02_001.png"));
     surfaceRender(mergedCloud, M1, MeanFrame1, img1);  % TODO get image
     % When you have the 3D point cloud of the moodel, use the built-in surf
     % function for the 3D surface plot. Then include RGB (texture) colour of
