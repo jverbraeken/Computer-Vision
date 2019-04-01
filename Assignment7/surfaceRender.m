@@ -32,13 +32,13 @@ function [] = surfaceRender(pointcloud, M, Mean, img)
     % % Centre point cloud around zero and use dot product to remove points
     % % behind the mean
     m  = [mean(X); mean(Y); mean(Z)]; 
-    X0 = [X'; Y'; Z' ];
-    X1 = repmat(viewdir, size(M, 1), size(M, 2));
-    Xm = repmat(m, size(M, 1), size(M, 2));
+    X0 = [X; Y; Z];
+    X1 = repmat(viewdir, 1, length(X0));
+    Xm = repmat(m, 1, length(X0));
 
     % Remove the points where the dot product between the mean subtracted points
     % (given by ‘X0 - Xm’) and the viewing direction is negative
-    indices = find(dot(X0 - Xm, viewdir));
+    indices = find(dot(X0 - Xm, X1) < 0);
     X(indices) = [];
     Y(indices) = [];
     Z(indices) = [];
@@ -59,17 +59,17 @@ function [] = surfaceRender(pointcloud, M, Mean, img)
 
 
     % Reshape (qx,qy,qz) to row vectors for next step
-    qxrow = zeros(numel(qx));
-    qyrow = zeros(numel(qy));
-    qzrow = zeros(numel(qz));
+    qxrow = reshape(qx, [], 1);
+    qyrow = reshape(qy, [], 1);
+    qzrow = reshape(qz, [], 1);
 
     % Transform to the main view using the corresponding motion / transformation matrix, M
-    q_xy = [qxrow * M; qyrow * M];
+    q_xy = [qxrow qyrow] * M;
 
     % All transformed points are normalized by mean values in advance, we have to move
     % them to the correct positions by adding corresponding mean values of each dimension.
-    q_x = q_xy(1, :) + Mean;
-    q_y = q_xy(2, :) + Mean;
+    q_x = q_xy(1, :) + Mean(1);
+    q_y = q_xy(2, :) + Mean(2);
 
     % Remove NaN values in q_x and q_y
     q_x(isnan(q_x))=1;
@@ -81,21 +81,21 @@ function [] = surfaceRender(pointcloud, M, Mean, img)
 
     if(size(img,3)==3)
         % Select the corresponding r,g,b image channels
-        imgr = img(3, 1);
-        imgg = img(3, 2);
-        imgb = img(3, 3);
+        imgr = img(:, :, 1);
+        imgg = img(:, :, 2);
+        imgb = img(:, :, 3);
 
         % Color selection from image according to (q_y, q_x) using sub2ind
-        Cr = imgr(subind(size(img, 1), q_x, q_y));
-        Cg = imgg(subind(size(img, 1), q_x, q_y));
-        Cb = imgb(subind(size(img, 1), q_x, q_y));
+        Cr = imgr(sub2ind(size(imgr), round(q_x), round(q_y)));
+        Cg = imgg(sub2ind(size(imgg), round(q_x), round(q_y)));
+        Cb = imgb(sub2ind(size(imgb), round(q_x), round(q_y)));
  
         qc(:,:,1) = reshape(Cr,size(qx));
         qc(:,:,2) = reshape(Cg,size(qy));
         qc(:,:,3) = reshape(Cb,size(qz));
     else 
         % If grayscale image, we only have 1 channel
-        C  = img(sub2ind(size(img, 1), q_x, q_y));
+        C  = img(sub2ind(size(img, 1), round(q_x), round(q_y)));
         qc = reshape(C,size(qx));
         colormap gray
     end
