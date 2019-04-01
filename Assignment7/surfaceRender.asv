@@ -68,8 +68,8 @@ function [] = surfaceRender(pointcloud, M, Mean, img)
 
     % All transformed points are normalized by mean values in advance, we have to move
     % them to the correct positions by adding corresponding mean values of each dimension.
-    q_x = q_xy(1, :) + Mean(1);
-    q_y = q_xy(2, :) + Mean(2);
+    q_x = q_xy(1, :) + Mean;
+    q_y = q_xy(2, :) + Mean;
 
     % Remove NaN values in q_x and q_y
     q_x(isnan(q_x))=1;
@@ -86,7 +86,7 @@ function [] = surfaceRender(pointcloud, M, Mean, img)
         imgb = img(:, :, 3);
 
         % Color selection from image according to (q_y, q_x) using sub2ind
-        Cr = imgr(sub2ind(size(imgr), round(q_x), round(q_y)));
+        Cr = imgr(sub2ind(size(imgr), min(round(q_x), round(q_y)));
         Cg = imgg(sub2ind(size(imgg), round(q_x), round(q_y)));
         Cb = imgb(sub2ind(size(imgb), round(q_x), round(q_y)));
  
