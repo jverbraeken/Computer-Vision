@@ -32,13 +32,13 @@ function [] = surfaceRender(pointcloud, M, Mean, img)
     % % Centre point cloud around zero and use dot product to remove points
     % % behind the mean
     m  = [mean(X); mean(Y); mean(Z)]; 
-    X0 = [X'; Y'; Z' ];
-    X1 = repmat(viewdir, size(M, 1), size(M, 2));
-    Xm = repmat(m, size(M, 1), size(M, 2));
+    X0 = [X'; Y'; Z'];
+    X1 = repmat(viewdir, size(X0, 1), size(X1, 2));
+    Xm = repmat(m, size(X1, 1), size(X1, 2));
 
     % Remove the points where the dot product between the mean subtracted points
     % (given by ‘X0 - Xm’) and the viewing direction is negative
-    indices = find(dot(X0 - Xm, viewdir));
+    indices = find(dot(X0 - Xm, X1) < 0);
     X(indices) = [];
     Y(indices) = [];
     Z(indices) = [];
@@ -59,9 +59,9 @@ function [] = surfaceRender(pointcloud, M, Mean, img)
 
 
     % Reshape (qx,qy,qz) to row vectors for next step
-    qxrow = zeros(numel(qx));
-    qyrow = zeros(numel(qy));
-    qzrow = zeros(numel(qz));
+    qxrow = reshape(qx, 1, []);
+    qyrow = reshape(qy, 1, []);
+    qzrow = reshape(qz, 1, []);
 
     % Transform to the main view using the corresponding motion / transformation matrix, M
     q_xy = [qxrow * M; qyrow * M];
@@ -86,16 +86,16 @@ function [] = surfaceRender(pointcloud, M, Mean, img)
         imgb = img(3, 3);
 
         % Color selection from image according to (q_y, q_x) using sub2ind
-        Cr = imgr(subind(size(img, 1), q_x, q_y));
-        Cg = imgg(subind(size(img, 1), q_x, q_y));
-        Cb = imgb(subind(size(img, 1), q_x, q_y));
+        Cr = imgr(subind(size(img, 1), round(q_x), round(q_y)));
+        Cg = imgg(subind(size(img, 1), round(q_x), round(q_y)));
+        Cb = imgb(subind(size(img, 1), round(q_x), round(q_y)));
  
         qc(:,:,1) = reshape(Cr,size(qx));
         qc(:,:,2) = reshape(Cg,size(qy));
         qc(:,:,3) = reshape(Cb,size(qz));
     else 
         % If grayscale image, we only have 1 channel
-        C  = img(sub2ind(size(img, 1), q_x, q_y));
+        C  = img(sub2ind(size(img, 1), round(q_x), round(q_y)));
         qc = reshape(C,size(qx));
         colormap gray
     end
