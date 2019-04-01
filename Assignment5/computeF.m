@@ -9,7 +9,7 @@ function F = computeF(A,T1,T2)
     % Solution for Af=0 using SVD
     [~, ~, V] = svd(A);
     f = V(:, end);
-    F = reshape(f, [3, 3])';
+    F = reshape(f, 3, 3);
 
     % Resolve the rank 2 constraint: det(F) =0 using SVD
     [U, S, V] = svd(F);
