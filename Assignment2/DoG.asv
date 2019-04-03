@@ -9,25 +9,22 @@
 %OUTPUT
 %   -loc: a matrix of nx3 with n found locations with [c, r, sigma]
 
-function loc = DoG(im,tf)
+function loc = DoG(im, tf)
     %im = rgb2gray(im);
     loc = [];
 
     % Prior smoothing sigma
     sigmaP = 1.6;
-    levels = 3;
+    levels = 5;
     
     % Scaling factor
     k = 2^(1/levels);
-    noOctaves = 4;
+    noOctaves = 3;
 
     GP = cell(levels+3,1);
     for i = 1:levels+3
         GP{i} = gaussian( sigmaP*(k^(i-2)) ); % TODO: you could use your own 
     end
-
-    % We start from a larger image
-    im2 = imresize(im,2);
 
     % For all octaves
     for octave = 1:noOctaves
@@ -36,19 +33,11 @@ function loc = DoG(im,tf)
         % Create the levels in the scale-space
         imG = cell(levels+3,1);
         for i = 1:levels+3
-            if octave == 1                
-                imG{i} = conv2(GP{i},GP{i},im2,'same');
-            else
-                imG{i} = conv2(GP{i},GP{i},im,'same');
-            end
+            imG{i} = conv2(GP{i},GP{i},im,'same');
         end
         
         % Computer the DoG (Difference of Gaussians)
-        if octave==1
-            imDoG = zeros(size(im2,1),size(im2,2),levels+2);
-        else
-            imDoG = zeros(size(im,1),size(im,2),levels+2);
-        end   
+        imDoG = zeros(size(im,1),size(im,2),levels+2);
         for i = 1:levels+2
             imDoG(:,:,i) = imG{i+1} - imG{i};
         end
@@ -67,11 +56,7 @@ function loc = DoG(im,tf)
         for i = 1:levels
 
             % Current sigma and octave scale
-            if octave==1
-                scale = 2.0^(octave-1.0)/2.0;
-            else
-                scale = 2.0^(octave-1.0);
-            end    
+            scale = 2.0^(octave-1.0);
             sigmaC = scale*sigmaP*(k^(i-1));
 
             % Get extrma points

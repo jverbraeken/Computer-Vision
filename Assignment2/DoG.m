@@ -1,5 +1,5 @@
 %function loc = DoG(im,tf)
-%   uses the DoG (Difference of Gaussian) approximation of a Lapalcian for finding 
+%   uses the DoG (Difference of Gaussian) approximation of a Laplacian for finding 
 %   the scale of the local feature points.
 %
 %INPUT
@@ -9,8 +9,7 @@
 %OUTPUT
 %   -loc: a matrix of nx3 with n found locations with [c, r, sigma]
 
-function loc = DoG(im,tf)
-    %im = rgb2gray(im);
+function loc = DoG(im, tf)
     loc = [];
 
     % Prior smoothing sigma
@@ -23,7 +22,7 @@ function loc = DoG(im,tf)
 
     GP = cell(levels+3,1);
     for i = 1:levels+3
-        GP{i} = gaussian( sigmaP*(k^(i-2)) ); % TODO: you could use your own 
+        GP{i} = gaussianImpl( sigmaP*(k^(i-2)) ); % TODO: you could use your own 
     end
 
     % For all octaves
@@ -47,8 +46,10 @@ function loc = DoG(im,tf)
         imExtrema = imExtrema(:,:,2:end-1);
         
         % Eliminate responses on the edge
-        imExtrema(1,:,:) = 0;imExtrema(end,:,:) = 0;
-        imExtrema(:,1,:) = 0;imExtrema(:,end,:) = 0;
+        imExtrema(1,:,:) = 0;
+        imExtrema(end,:,:) = 0;
+        imExtrema(:,1,:) = 0;
+        imExtrema(:,end,:) = 0;
         imDoG = imDoG(:,:,2:end-1);
     
         % Put local maxima in vector with corresponding sigma and test for
@@ -59,7 +60,7 @@ function loc = DoG(im,tf)
             scale = 2.0^(octave-1.0);
             sigmaC = scale*sigmaP*(k^(i-1));
 
-            % Get extrma points
+            % Get extrema points
             [row,col] = find(imExtrema(:,:,i)==1);
  
             % Test for flatness

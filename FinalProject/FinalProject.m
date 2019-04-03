@@ -1,42 +1,52 @@
 % Final Project
+addpath(genpath("../Assignment2"));
 addpath(genpath("../Assignment3"));
 addpath(genpath("../Assignment5"));
 addpath(genpath("../Assignment6"));
 addpath(genpath("../Assignment7"));
 addpath(genpath("../vlfeat-0.9.21"));
 
+dir_generated = './generated/';
+
 %% 0nd step: Read the images and resize
 disp("0nd step: Read the images and resize");
 
 I = imageParser('model_castle', 'JPG');
-% I = imresize(I, 0.5);  % Prevent Out-of-Memory exception
+n = size(I, 4);
+I = imresize(I, 0.35);  % Prevent Out-of-Memory exception
 
 disp("----");
 %% 1st step: Find correspondences between consecutive matching
 disp("1st step: Find correspondences between consecutive matching");
 
-ind = randi(size(I, 3), 1, 1);
-ind2 = mod(ind-1, size(I, 3)) + 1;  % ind2 = (ind != size(I, 3)) ? ind : 1
-dist_thres = 0.8;
-edge_thres = 0.1;
-mode = 'own';
-[match1, match2] = findMatches(I(:, :, ind), I(:, :, ind2), dist_thres, edge_thres, mode);
+if exist(strcat(dir_generated, 'Matches.mat'))
+    load(strcat(dir_generated, 'Matches.mat'));
+else
+    for i = 1:n
+        fprintf("Iteration %d of %d\n", i, n);
+        next = mod(i, n) + 1;
+        dist_thres = 0.8;
+        edge_thres = 0.1;  % Maybe 0.001
+        mode = 'own';
+        [matches, match1, match2] = findMatches(I(:, :, :, i), I(:, :, :, next), dist_thres, edge_thres, mode);
+
+        % 2nd step: Apply normalized 8-point RANSAC algorithm to find best matches
+        % disp("2nd step: Apply normalized 8-point RANSAC algorithm to find best matches");
+        [~, inliers] = estimateFundamentalMatrix(match1(1:2, :), match2(1:2, :));
+        Matches{i} = matches(:,inliers);
+    end
+    save(strcat(dir_generated, 'Matches.mat'), 'Matches');
+end
 
 disp("----");
-%% 2nd step: Apply normalized 8-point RANSAC algorithm to find best matches
-disp("2nd step: Apply normalized 8-point RANSAC algorithm to find best matches");
-[F, inliers] = estimateFundamentalMatrix(match1(1:2, :), match2(1:2, :));
-Matches{i} = match(:,inliers);
-
-disp("----");   
 %% 3rd step: Represent point correspondes for different camera views
 disp("3rd step: Represent point correspondes for different camera views");
 
-if exist(strcat(directory, 'PVfinal.mat'))
-    load(strcat(directory, 'PVfinal.mat'));
+if exist(strcat(dir_generated, 'PV.mat'))
+    load(strcat(dir_generated, 'PV.mat'));
 else
-    [PV] = chainimages(matches);
-    save(strcat(directory, 'PVfinal.mat'), 'PVfinal');
+    [PV] = chainimages(Matches);
+    save(strcat(dir_generated, 'PV.mat'), 'PV');
 end
 
 disp("----");

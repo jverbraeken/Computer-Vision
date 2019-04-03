@@ -2,7 +2,7 @@
 
 function F = ImageDerivatives(img, sigma, type)
 
-    G = gaussian(sigma);
+    G = gaussianImpl(sigma);
     med = round(length(G)/2);
     y = 1:length(G);
     x = y - med;

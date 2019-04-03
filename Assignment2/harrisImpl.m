@@ -1,7 +1,8 @@
-function [r, c, sigmas] = harris(im, loc, thres)
+function [r, c, sigmas] = harrisImpl(im, loc, thres)
     % inputs: 
     % im: double grayscale image
     % loc: list of interest points from the Laplacian approximation
+    % thres: 0.001 should work fine
     % outputs:
     % [r,c,sigmas]: The row and column of each point is returned in r and c
     %              and the sigmas 'scale' at which they were found
@@ -15,7 +16,7 @@ function [r, c, sigmas] = harris(im, loc, thres)
     
     gamma = 0.7;
     
-    G = gaussian(gamma);
+    G = gaussianImpl(gamma);
     Gder = gaussianDer(G, gamma);
     Ix =  conv2(im, Gder, 'same');
     Iy =  conv2(im, Gder', 'same');

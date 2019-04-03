@@ -27,7 +27,7 @@ length = 129;
 med = ceil(length/2);
 F = zeros(length, length);
 F(med, med) = 1;
-G = gaussian(sigma);
+G = gaussianImpl(sigma);
 
 % Zero derivative: blurring
 FF = conv2(G,G,F);

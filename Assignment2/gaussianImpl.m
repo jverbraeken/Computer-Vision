@@ -1,4 +1,4 @@
-function G = gaussian(sigma)
+function G = gaussianImpl(sigma)
 
 L = ceil(3*sigma);
 
