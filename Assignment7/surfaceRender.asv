@@ -103,7 +103,7 @@ function [] = surfaceRender(pointcloud, M, Mean, img)
     
     % Remove vertices that are too far away from the feature points
     for i = 1:numel(qx)
-        if min(sqrt((qx(i)-X).^2 + (qy(i)-Y).^2)) > 80
+        if min(sqrt((qx(i)-X).^2 + (qy(i)-Y).^2)) > 0.1
             qx(i) = NaN;
             qy(i) = NaN;
             qz(i) = NaN;
