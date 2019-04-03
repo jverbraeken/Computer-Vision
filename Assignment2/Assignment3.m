@@ -1,5 +1,4 @@
 % Find features and make descriptor of image 1 2
-loc1 = DoG(im1, tf)
 [r1,c1,s1] = harris(im1);
 [f1,d1] = sift(single(im1),r1,c1, s1);
 

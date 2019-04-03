@@ -37,11 +37,7 @@ function loc = DoG(im,tf)
         end
         
         % Computer the DoG (Difference of Gaussians)
-        if octave==1
-            imDoG = zeros(size(im2,1),size(im2,2),levels+2);
-        else
-            imDoG = zeros(size(im,1),size(im,2),levels+2);
-        end   
+        imDoG = zeros(size(im,1),size(im,2),levels+2);
         for i = 1:levels+2
             imDoG(:,:,i) = imG{i+1} - imG{i};
         end
@@ -60,11 +56,7 @@ function loc = DoG(im,tf)
         for i = 1:levels
 
             % Current sigma and octave scale
-            if octave==1
-                scale = 2.0^(octave-1.0)/2.0;
-            else
-                scale = 2.0^(octave-1.0);
-            end    
+            scale = 2.0^(octave-1.0);
             sigmaC = scale*sigmaP*(k^(i-1));
 
             % Get extrma points

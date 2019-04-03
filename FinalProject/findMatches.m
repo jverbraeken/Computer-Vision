@@ -75,12 +75,12 @@ switch mode
                 match2 = [match2, pts2];
             end
         end
-end
-figure; imshow([im1, im2], []);
-hold on;
-scatter(coord1(1,:), coord1(2,:), coord1(3,:), [1,1,0]);
-scatter(size(im1,2)+coord2(1,:), coord2(2,:), coord2(3,:), [1,1,0]);
-drawnow;
-line([match1(1,:);size(im1,2)+match2(1,:)],[match1(2,:);match2(2,:)]);
+    end
+    figure; imshow([im1, im2], []);
+    hold on;
+    scatter(coord1(1,:), coord1(2,:), coord1(3,:), [1,1,0]);
+    scatter(size(im1,2)+coord2(1,:), coord2(2,:), coord2(3,:), [1,1,0]);
+    drawnow;
+    line([match1(1,:); size(im1,2)+match2(1,:)],[match1(2,:); match2(2,:)]);
 
 end

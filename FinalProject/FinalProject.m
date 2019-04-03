@@ -1,14 +1,15 @@
 % Final Project
-addpath("../Assignment3");
-addpath("../Assignment5");
-addpath("../Assignment6");
-addpath("../Assignment7");
+addpath(genpath("../Assignment3"));
+addpath(genpath("../Assignment5"));
+addpath(genpath("../Assignment6"));
+addpath(genpath("../Assignment7"));
+addpath(genpath("../vlfeat-0.9.21"));
 
 %% 0nd step: Read the images and resize
 disp("0nd step: Read the images and resize");
 
 I = imageParser('model_castle', 'JPG');
-I = imresize(I, 0.5);  % Prevent Out-of-Memory exception
+% I = imresize(I, 0.5);  % Prevent Out-of-Memory exception
 
 disp("----");
 %% 1st step: Find correspondences between consecutive matching
@@ -25,6 +26,7 @@ disp("----");
 %% 2nd step: Apply normalized 8-point RANSAC algorithm to find best matches
 disp("2nd step: Apply normalized 8-point RANSAC algorithm to find best matches");
 [F, inliers] = estimateFundamentalMatrix(match1(1:2, :), match2(1:2, :));
+Matches{i} = match(:,inliers);
 
 disp("----");   
 %% 3rd step: Represent point correspondes for different camera views
