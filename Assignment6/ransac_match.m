@@ -16,7 +16,7 @@ function [C, D, Matches] = ransac_match(directory)
     % Load all features (coordinates and descriptors of interest points)
     % As an example, we concatenate the haraff and hesaff sift features
     % You can also use features extracted from your own Harris function.
-    for i= 1:n
+    for i = 1:n
         disp('image num');
         %i
         [coord_haraff,desc_haraff,~,~] = loadFeatures(strcat(directory, Files(i).name, '.haraff.sift'));

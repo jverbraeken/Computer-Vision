@@ -5,34 +5,35 @@
 %		tf_reject - matching reject threshold -- can be 0.8
 %       tf_harris - harris corner detector threshold -- can be 0.001
 % outputs:
-%		match1 - the coordinates in image 1
-%		match2 - the coordinates in image 2 matched to the ones in image 1
+%       matches - 2d array of all matched feature points
+%		match1 - the coordinates of the matches in image 1
+%		match2 - the coordinates of the matches in image 2 matched to the ones in image 1
+%       coord1 - the coordinates of te feature points in image 1
 
-function [matches, match1, match2] = findMatches(im1, im2, tf_reject, tf_harris, mode)
+function [matches, match1, match2, coord1] = findMatches(im1, im2, tf_dog_flatness, tf_reject, tf_harris, mode)
     im1 = single(rgb2gray(im1));
     im2 = single(rgb2gray(im2));
     switch mode
         case 'vl'  % Use library functions to find the matches
-            [coord1, descriptor1] = vl_sift(im1);
-            [coord2, descriptor2] = vl_sift(im2);
+            [coord1, descriptor1] = sift(im1);
+            [coord2, descriptor2] = sift(im2);
             matches = vl_ubcmatch(descriptor1, descriptor2);
             match1 = coord1(:,matches(1,:));
             match2 = coord2(:,matches(2,:));
         otherwise  % Use our own function to find the matches
             % Find features and make descriptor of image 1
-            loc1                  = DoG(im1, 0.8);
-            loc2                  = DoG(im2,0.01);
+            loc1                  = DoG(im1, tf_dog_flatness);
+            loc2                  = DoG(im2, tf_dog_flatness);
             [r1, c1, sigma1]      = harrisImpl(im1, loc1, tf_harris);
             orient1               = zeros(size(sigma1));
 
             % Pay attention to the oder of parameters [c',r'] (equal to [x,y])
-            [coord1, descriptor1] = vl_sift(im1, 'frames', [c1'; r1'; sigma1'; orient1']);
+            [coord1, descriptor1] = sift(im1, 'frames', [c1'; r1'; sigma1'; orient1']);
             %  Custom implementation of sift. You can compare this result with your own implementation.
-            % [coord1, descriptor1] = sift(single(rgb2gray(im1)));
             % Find features and make descriptor of image 2
             [r2, c2, sigma2]      = harrisImpl(im2, loc2, tf_harris);
             orient2               = zeros(size(sigma2));
-            [coord2, descriptor2] = vl_sift(im2, 'frames', [c2'; r2'; sigma2'; orient2']);
+            [coord2, descriptor2] = sift(im2, 'frames', [c2'; r2'; sigma2'; orient2']);
 
             % Create two arrays containing the points location in both images
             matches = [];

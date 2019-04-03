@@ -19,35 +19,35 @@ disp("----");
 %% 1st step: Find correspondences between consecutive matching
 disp("1st step: Find correspondences between consecutive matching");
 
-if exist(strcat(dir_generated, 'Matches.mat'))
+if exist(strcat(dir_generated, 'Matches.mat')) && exist(strcat(dir_generated, 'C.mat'))
     load(strcat(dir_generated, 'Matches.mat'));
+    load(strcat(dir_generated, 'C.mat'));
 else
+    C = {};
     for i = 1:n
         fprintf("Iteration %d of %d\n", i, n);
         next = mod(i, n) + 1;
         dist_thres = 0.8;
         edge_thres = 0.1;  % Maybe 0.001
-        mode = 'own';
-        [matches, match1, match2] = findMatches(I(:, :, :, i), I(:, :, :, next), dist_thres, edge_thres, mode);
+        dog_flatness_thres = 0.01;
+        mode = 'vl';
+        [matches, match1, match2, coord1] = findMatches(I(:, :, :, i), I(:, :, :, next), dog_flatness_thres, dist_thres, edge_thres, mode);
 
         % 2nd step: Apply normalized 8-point RANSAC algorithm to find best matches
         % disp("2nd step: Apply normalized 8-point RANSAC algorithm to find best matches");
         [~, inliers] = estimateFundamentalMatrix(match1(1:2, :), match2(1:2, :));
         Matches{i} = matches(:,inliers);
+        C{i} = coord1(1:2, :);
     end
     save(strcat(dir_generated, 'Matches.mat'), 'Matches');
+    save(strcat(dir_generated, 'C.mat'), 'C');
 end
 
 disp("----");
 %% 3rd step: Represent point correspondes for different camera views
 disp("3rd step: Represent point correspondes for different camera views");
 
-if exist(strcat(dir_generated, 'PV.mat'))
-    load(strcat(dir_generated, 'PV.mat'));
-else
-    [PV] = chainimages(Matches);
-    save(strcat(dir_generated, 'PV.mat'), 'PV');
-end
+[PV] = chainimages(Matches);
 
 disp("----");
 %% 4th step: Stitch points together
@@ -55,7 +55,7 @@ disp("4th step: Stitch points together");
 
 Clouds = {};
 i = 1;
-numFrames=3;
+numFrames = 3;
 
 for iBegin = 1:n
     iEnd = mod(iBegin + 2, n); 
@@ -89,12 +89,12 @@ for iBegin = 1:n
         X(2 * f, :)     = coord(2, block(f, :));
     end
 
-    save(strcat(directory, 'X.mat'), 'X');
+    save(strcat(dir_generated, 'X.mat'), 'X');
 
     % Estimate 3D coordinates of each block following Lab 4 "Structure from Motion" to compute the M and S matrix.
     % Here, an additional output "p" is added to deal with the non-positive matrix error
     % Please check the chol function inside sfm.m for detail.
-    [M, S, p] = sfm(directory);     % Your structure from motion implementation for the measurements X
+    [M, S, p] = sfm(dir_generated);     % Your structure from motion implementation for the measurements X
 
     if i == 1 && ~p
         M1 = M(1:2, :);
@@ -145,6 +145,8 @@ for i = 2:numClouds
     mergedInds           = [mergedInds iNew];
 end
 
+mergedCloud(3,:) = mergedCloud(3,:) * (-1);
+
 disp("----");
 %% 5th step: Eliminate affine ambiguity
 disp("5th step: Eliminate affine ambiguity");
@@ -153,19 +155,19 @@ disp("5th step: Eliminate affine ambiguity");
 % Orthographic: We need to impose that image axes (a1 and a2) are perpendicular and their scale is 1.
 % (a1: col vector, projection of x; a2: row vector, projection of y;,)
 % We define the starting value for L, L0 as: A1 L0 A1' = Id 
-A1 = M(1:2, :);
-L0 = pinv(A1' * A1);
+% A1 = M(1:2, :);
+% L0 = pinv(A1' * A1);
 
 % We solve L by iterating through all images and finding L one which minimizes Ai*L*Ai' = Id, for all i.
 % LSQNONLIN solves non-linear least squares problems. Please check the Matlab documentation.
-L = lsqnonlin(@residuals, L0);
+% L = lsqnonlin(@residuals, L0);
 
 % Recover C from L by Cholesky decomposition.
-C = chol(L,'lower');
+% C = chol(L,'lower');
 
 % Update M and S with the corresponding C form: M = MC and S = C^{-1}S. 
-M = M * C;
-S = pinv(C) * S;
+% M = M * C;
+% S = pinv(C) * S;
 
 disp("----");
 %% 6th step: Plot 3D model
