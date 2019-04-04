@@ -10,19 +10,19 @@ step1 = struct('haraff_hesaff', 1, 'library', 2, 'own', 3);
 
 choice_step1 = step1.haraff_hesaff;
 dir_generated = './generated/';
-dir_features = './model_castle/';
+dir_features = './modelCastle_features/';
 
 
 %% 0nd step: Read the images and resize
 disp("0nd step: Read the images and resize");
 
-% if exist(strcat(dir_generated, 'images.mat'))
-%     load(strcat(dir_generated, 'images.mat'));
-% else
-    images = imageParser(dir_features, 'jpg');
+if exist(strcat(dir_generated, 'images.mat'))
+    load(strcat(dir_generated, 'images.mat'));
+else
+    images = imageParser(dir_features, 'png');
     images = imresize(images, 0.35);  % Prevent Out-of-Memory exception
-%     save(strcat(dir_generated, 'images.mat'), 'images');
-% end
+    save(strcat(dir_generated, 'images.mat'), 'images');
+end
 n = size(images, 4);
 
 disp("----");

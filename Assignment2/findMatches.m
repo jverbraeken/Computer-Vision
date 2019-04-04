@@ -13,16 +13,13 @@
 function [matches, match1, match2, coord1] = findMatches(im1, im2, tf_dog_flatness, tf_reject, tf_harris)
     im1 = single(rgb2gray(im1));
     im2 = single(rgb2gray(im2));
-    % Find features and make descriptor of image 1
+    
     loc1                  = DoG(im1, tf_dog_flatness);
-    loc2                  = DoG(im2, tf_dog_flatness);
     [r1, c1, sigma1]      = harrisImpl(im1, loc1, tf_harris);
     orient1               = zeros(size(sigma1));
-
-    % Pay attention to the oder of parameters [c',r'] (equal to [x,y])
     [coord1, descriptor1] = sift(im1, 'frames', [c1'; r1'; sigma1'; orient1']);
-    %  Custom implementation of sift. You can compare this result with your own implementation.
-    % Find features and make descriptor of image 2
+    
+    loc2                  = DoG(im2, tf_dog_flatness);
     [r2, c2, sigma2]      = harrisImpl(im2, loc2, tf_harris);
     orient2               = zeros(size(sigma2));
     [coord2, descriptor2] = sift(im2, 'frames', [c2'; r2'; sigma2'; orient2']);

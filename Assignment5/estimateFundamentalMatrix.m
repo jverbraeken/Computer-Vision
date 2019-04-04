@@ -86,7 +86,6 @@ function [bestF, bestinliers] = estimateFundamentalMatrix(match1, match2)
             iterations = max(miniter, ceil(N));
         end
         i = i+1;
-        
     end
 
     disp(strcat(int2str(iterations), ' iterations used to estimate F'));
