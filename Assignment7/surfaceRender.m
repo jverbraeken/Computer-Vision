@@ -38,7 +38,7 @@ function [] = surfaceRender(pointcloud, M, Mean, img)
 
     % Remove the points where the dot product between the mean subtracted points
     % (given by ‘X0 - Xm’) and the viewing direction is negative
-    indices = find(dot(X0 - Xm, X1) < 0);
+    indices = find(dot(X0 - Xm, X1) < -1);
     X(indices) = [];
     Y(indices) = [];
     Z(indices) = [];
@@ -52,7 +52,8 @@ function [] = surfaceRender(pointcloud, M, Mean, img)
     % You can also use scatteredInterpolant instead.
     % Please check the detailed usage of these functions
     F  = scatteredInterpolant(X', Y', Z');
-    qz = F(qx,qy); 
+    qz = F(qx,qy);
+    qz = conv2(qz, [0.25; 0.5; 0.25], 'same');
 
     % Note: qz contains NaNs because some points in Z direction may not defined
     % This will lead to NaNs in the following calculation.
@@ -101,9 +102,21 @@ function [] = surfaceRender(pointcloud, M, Mean, img)
         colormap gray
     end
     
+    % Remove vertices that are extrapolated too high or low
+    indices = find(qz < min(Z));
+    qx(indices) = NaN;
+    qy(indices) = NaN;
+    qz(indices) = NaN;
+    qc(indices) = NaN;
+    indices = find(qz > max(Z));
+    qx(indices) = NaN;
+    qy(indices) = NaN;
+    qz(indices) = NaN;
+    qc(indices) = NaN;
+    
     % Remove vertices that are too far away from the feature points
     for i = 1:numel(qx)
-        if min(sqrt((qx(i)-X).^2 + (qy(i)-Y).^2)) > 80
+        if min(sqrt((qx(i)-X).^2 + (qy(i)-Y).^2) + (qz(i)-Z).^2) > 150
             qx(i) = NaN;
             qy(i) = NaN;
             qz(i) = NaN;
@@ -113,9 +126,11 @@ function [] = surfaceRender(pointcloud, M, Mean, img)
     
     % Display surface
     surf(qx, qy, qz, qc);
+    hold on;
+    scatter3(X, Y, Z, 20, [1 0 0], 'filled');
      
     % Render parameters
-    axis([floor(min(X)) ceil(max(X)) floor(min(Y)) ceil(max(Y)) floor(min(Z)) ceil(max(Z))]);
+    axis([floor(min(qx(:))) ceil(max(qx(:))) floor(min(qy(:))) ceil(max(qy(:))) floor(min(qz(:))) ceil(max(qz(:)))]);
     daspect([1 1 1]);
     rotate3d;
 
