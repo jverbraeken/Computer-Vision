@@ -6,41 +6,87 @@ addpath(genpath("../Assignment6"));
 addpath(genpath("../Assignment7"));
 addpath(genpath("../vlfeat-0.9.21"));
 
+step1 = struct('haraff_hesaff', 1, 'library', 2, 'own', 3);
+
+choice_step1 = step1.haraff_hesaff;
 dir_generated = './generated/';
+dir_features = './modelCastle_features/';
+
 
 %% 0nd step: Read the images and resize
 disp("0nd step: Read the images and resize");
 
-I = imageParser('model_castle', 'JPG');
-n = size(I, 4);
-I = imresize(I, 0.35);  % Prevent Out-of-Memory exception
+if exist(strcat(dir_generated, 'images.mat'))
+    load(strcat(dir_generated, 'images.mat'));
+else
+    images = imageParser(dir_features, 'png');
+    images = imresize(images, 0.35);  % Prevent Out-of-Memory exception
+    save(strcat(dir_generated, 'images.mat'), 'images');
+end
+n = size(images, 4);
 
 disp("----");
 %% 1st step: Find correspondences between consecutive matching
 disp("1st step: Find correspondences between consecutive matching");
 
-if exist(strcat(dir_generated, 'Matches.mat')) && exist(strcat(dir_generated, 'C.mat'))
-    load(strcat(dir_generated, 'Matches.mat'));
-    load(strcat(dir_generated, 'C.mat'));
-else
-    C = {};
-    for i = 1:n
-        fprintf("Iteration %d of %d\n", i, n);
-        next = mod(i, n) + 1;
-        dist_thres = 0.8;
-        edge_thres = 0.1;  % Maybe 0.001
-        dog_flatness_thres = 0.01;
-        mode = 'vl';
-        [matches, match1, match2, coord1] = findMatches(I(:, :, :, i), I(:, :, :, next), dog_flatness_thres, dist_thres, edge_thres, mode);
+switch choice_step1
+    case step1.haraff_hesaff
+        if exist(strcat(dir_generated, 'matches_haraff_hesaff.mat')) && exist(strcat(dir_generated, 'C_haraff_hesaff.mat'))
+            load(strcat(dir_generated, 'matches_haraff_hesaff.mat'));
+            load(strcat(dir_generated, 'C_haraff_hesaff.mat'));
+        else
+            % 2nd step also included: Apply normalized 8-point RANSAC algorithm to find best matches
+            [C, ~, matches] = ransac_match(dir_features);
+            save(strcat(dir_generated, 'matches_haraff_hesaff.mat'), 'matches');
+            save(strcat(dir_generated, 'C_haraff_hesaff.mat'), 'C');
+        end
+        
+    case step1.library
+        if exist(strcat(dir_generated, 'matches_library.mat')) && exist(strcat(dir_generated, 'C_library.mat'))
+            load(strcat(dir_generated, 'matches_library.mat'));
+            load(strcat(dir_generated, 'C_library.mat'));
+        else
+            for i = 1:n
+                fprintf("Iteration %d of %d\n", i, n);
+                next = mod(i, n) + 1;
+                [feature_coordinates_1, feature_descriptors_1] = sift(single(rgb2gray(images(:, :, :, i))));
+                [feature_coordinates_2, feature_descriptors_2] = sift(single(rgb2gray(images(:, :, :, next))));
+                matches_ = vl_ubcmatch(feature_descriptors_1, feature_descriptors_2);
+                match_coordinates_1 = feature_coordinates_1(:,matches_(1,:));
+                match_coordinates_2 = feature_coordinates_2(:,matches_(2,:));
 
-        % 2nd step: Apply normalized 8-point RANSAC algorithm to find best matches
-        % disp("2nd step: Apply normalized 8-point RANSAC algorithm to find best matches");
-        [~, inliers] = estimateFundamentalMatrix(match1(1:2, :), match2(1:2, :));
-        Matches{i} = matches(:,inliers);
-        C{i} = coord1(1:2, :);
-    end
-    save(strcat(dir_generated, 'Matches.mat'), 'Matches');
-    save(strcat(dir_generated, 'C.mat'), 'C');
+                % 2nd step: Apply normalized 8-point RANSAC algorithm to find best matches
+                % disp("2nd step: Apply normalized 8-point RANSAC algorithm to find best matches");
+                [~, inliers] = estimateFundamentalMatrix(match_coordinates_1(1:2, :), match_coordinates_2(1:2, :));
+                matches{i} = matches_(:,inliers);
+                C{i} = feature_coordinates_1(1:2, :);
+            end
+            save(strcat(dir_generated, 'matches_library.mat'), 'matches');
+            save(strcat(dir_generated, 'C_library.mat'), 'C');
+        end
+        
+    case step1.own
+        if exist(strcat(dir_generated, 'matches_own.mat')) && exist(strcat(dir_generated, 'C_own.mat'))
+            load(strcat(dir_generated, 'matches_own.mat'));
+            load(strcat(dir_generated, 'C_own.mat'));
+        else
+            for i = 1:n
+                fprintf("Iteration %d of %d\n", i, n);
+                next = mod(i, n) + 1;
+                dist_thres = 1;
+                edge_thres = 0.1;  % Maybe 0.001
+                dog_flatness_thres = 0.01;
+                [matches_, match_coordinates_1, match_coordinates_2, feature_coordinates_1] = findMatches(images(:, :, :, i), images(:, :, :, next), dog_flatness_thres, dist_thres, edge_thres);
+
+                % 2nd step: Apply normalized 8-point RANSAC algorithm to find best matches
+                % disp("2nd step: Apply normalized 8-point RANSAC algorithm to find best matches");
+                [~, inliers] = estimateFundamentalMatrix(match_coordinates_1(1:2, :), match_coordinates_2(1:2, :));
+                matches{i} = matches_(:,inliers);
+                C{i} = feature_coordinates_1(1:2, :);
+            end
+            save(strcat(dir_generated, 'matches_own.mat'), 'matches');
+            save(strcat(dir_generated, 'C_own.mat'), 'C');
+        end
 end
 
 disp("----");
@@ -173,6 +219,12 @@ disp("----");
 %% 6th step: Plot 3D model
 disp("6th step: Plot 3D model");
 
-plot3(S(1,:),S(2,:),S(3,:),'.r');
+X = mergedCloud(1,:)';
+Y = mergedCloud(2,:)';
+Z = mergedCloud(3,:)';
+scatter3(X, Y, Z, 20, [1 0 0], 'filled');
+axis( [-500 500 -500 500 -500 500] )
+daspect([1 1 1])
+rotate3d
 
 disp("----");
