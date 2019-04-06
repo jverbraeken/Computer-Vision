@@ -36,6 +36,9 @@ function [] = reconstruction_demo()
     Clouds = {};
     i = 1;
     numFrames=3;
+    
+    mainView = [];
+    mainViewNotSet = true;
 
     for iBegin = 1:n
         iEnd = mod(iBegin + 2, n); 
@@ -76,9 +79,11 @@ function [] = reconstruction_demo()
         % Please check the chol function inside sfm.m for detail.
         [M, S, p] = sfm(directory);     % Your structure from motion implementation for the measurements X
 
-        if i == 1 && ~p
+        if mainViewNotSet && ~p
+            mainView = i;
+            mainViewNotSet = false;
             M1 = M(1:2, :);
-            MeanFrame1 = sum(X, 2) / numPoints;
+            MeanFrame1 = mean(X, 2);
         end
         if ~p
             % Compose Clouds in the form of (M,S,colInds)
@@ -121,11 +126,12 @@ function [] = reconstruction_demo()
 
         % Transform the new points using: Z = T.b * T * T.T + T.c.
         % and store them in the merged cloud, and add their indexes to merged set
-        mergedCloud(:, iNew) = T.b * T.T' * Clouds{i, 2}(:, iCloudsNew) + T.c';
+        %mergedCloud(:, iNew) = T.b * T.T' * Clouds{i, 2}(:, iCloudsNew) + T.c';
+        mergedCloud(:, iNew) = (T.b * Clouds{i, 2}(:, iCloudsNew)' * T.T + T.c)';
         mergedInds           = [mergedInds iNew];
     end
 
-    mergedCloud(3,:) = mergedCloud(3,:) * (-1);
+    %mergedCloud(3,:) = mergedCloud(3,:) * (-1);
     
     % Plot the full merged cloud
     % Helpful for debugging and visualizing your reconstruction

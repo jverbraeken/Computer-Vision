@@ -25,7 +25,7 @@ function [] = surfaceRender(pointcloud, M, Mean, img)
     % % % that is perpendicular (orthogonal) to both a and b, 
     % % % with a direction given by the right-hand rule and a magnitude 
     % % % equal to the area of the parallelogram that the vectors span.
-    viewdir = cross(M(1,:), M(2,:));
+    viewdir = cross(M(2,:), M(1,:));
     viewdir = viewdir / sum(abs(viewdir)); % sum(abs(viewdir))=1
     viewdir = viewdir';
     
@@ -51,7 +51,7 @@ function [] = surfaceRender(pointcloud, M, Mean, img)
     % Surface generation using TriScatteredInterp
     % You can also use scatteredInterpolant instead.
     % Please check the detailed usage of these functions
-    F  = scatteredInterpolant(X', Y', Z');
+    F  = TriScatteredInterp(X', Y', Z');
     qz = F(qx,qy); 
 
     % Note: qz contains NaNs because some points in Z direction may not defined
@@ -60,9 +60,9 @@ function [] = surfaceRender(pointcloud, M, Mean, img)
 
     % Reshape (qx,qy,qz) to row vectors for next step
     %qxrow = reshape(qx, [numel(qx), 1]); 
-    qxrow = qx(:)';
-    qyrow = qy(:)';
-    qzrow = qz(:)';
+    qxrow = reshape(qx, 1, numel(qx));
+    qyrow = reshape(qy, 1, numel(qy));
+    qzrow = reshape(qz, 1, numel(qz));
 
     % Transform to the main view using the corresponding motion / transformation matrix, M
     q_xy = M * [qxrow; qyrow; qzrow];
