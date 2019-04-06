@@ -15,6 +15,8 @@ function [matches, match1, match2, coord1] = findMatches(im1, im2, tf_dog_flatne
     im2 = single(rgb2gray(im2));
     
     loc1                  = DoG(im1, tf_dog_flatness);
+%     imshow(im1); hold on;
+%     scatter(loc1(:, 1), loc1(:, 2), loc1(:, 3) * 4, [1, 1, 0]);
     [r1, c1, sigma1]      = harrisImpl(im1, loc1, tf_harris);
     orient1               = zeros(size(sigma1));
     [coord1, descriptor1] = sift(im1, 'frames', [c1'; r1'; sigma1'; orient1']);

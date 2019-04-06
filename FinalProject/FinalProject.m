@@ -10,192 +10,38 @@ step1 = struct('haraff_hesaff', 1, 'library', 2, 'own', 3);
 
 choice_step1 = step1.haraff_hesaff;
 dir_generated = './generated/';
-dir_features = './model_castle/';
+dir_features = './modelCastle_features/';
 
 
 %% 0nd step: Read the images and resize
 disp("0nd step: Read the images and resize");
 
-% if exist(strcat(dir_generated, 'images.mat'))
-%     load(strcat(dir_generated, 'images.mat'));
-% else
-    images = imageParser(dir_features, 'jpg');
-    images = imresize(images, 0.35);  % Prevent Out-of-Memory exception
-%     save(strcat(dir_generated, 'images.mat'), 'images');
-% end
-n = size(images, 4);
+[n, images] = step_0(dir_generated, dir_features);
 
 disp("----");
 %% 1st step: Find correspondences between consecutive matching
+% 2nd step: Apply normalized 8-point RANSAC algorithm to find best matches
 disp("1st step: Find correspondences between consecutive matching");
 
-switch choice_step1
-    case step1.haraff_hesaff
-        if exist(strcat(dir_generated, 'matches_haraff_hesaff.mat')) && exist(strcat(dir_generated, 'C_haraff_hesaff.mat'))
-            load(strcat(dir_generated, 'matches_haraff_hesaff.mat'));
-            load(strcat(dir_generated, 'C_haraff_hesaff.mat'));
-        else
-            % 2nd step also included: Apply normalized 8-point RANSAC algorithm to find best matches
-            [C, ~, matches] = ransac_match(dir_features);
-            save(strcat(dir_generated, 'matches_haraff_hesaff.mat'), 'matches');
-            save(strcat(dir_generated, 'C_haraff_hesaff.mat'), 'C');
-        end
-        
-    case step1.library
-        if exist(strcat(dir_generated, 'matches_library.mat')) && exist(strcat(dir_generated, 'C_library.mat'))
-            load(strcat(dir_generated, 'matches_library.mat'));
-            load(strcat(dir_generated, 'C_library.mat'));
-        else
-            for i = 1:n
-                fprintf("Iteration %d of %d\n", i, n);
-                next = mod(i, n) + 1;
-                [feature_coordinates_1, feature_descriptors_1] = sift(single(rgb2gray(images(:, :, :, i))));
-                [feature_coordinates_2, feature_descriptors_2] = sift(single(rgb2gray(images(:, :, :, next))));
-                matches_ = vl_ubcmatch(feature_descriptors_1, feature_descriptors_2);
-                match_coordinates_1 = feature_coordinates_1(:,matches_(1,:));
-                match_coordinates_2 = feature_coordinates_2(:,matches_(2,:));
-
-                % 2nd step: Apply normalized 8-point RANSAC algorithm to find best matches
-                % disp("2nd step: Apply normalized 8-point RANSAC algorithm to find best matches");
-                [~, inliers] = estimateFundamentalMatrix(match_coordinates_1(1:2, :), match_coordinates_2(1:2, :));
-                matches{i} = matches_(:,inliers);
-                C{i} = feature_coordinates_1(1:2, :);
-            end
-            save(strcat(dir_generated, 'matches_library.mat'), 'matches');
-            save(strcat(dir_generated, 'C_library.mat'), 'C');
-        end
-        
-    case step1.own
-        if exist(strcat(dir_generated, 'matches_own.mat')) && exist(strcat(dir_generated, 'C_own.mat'))
-            load(strcat(dir_generated, 'matches_own.mat'));
-            load(strcat(dir_generated, 'C_own.mat'));
-        else
-            for i = 1:n
-                fprintf("Iteration %d of %d\n", i, n);
-                next = mod(i, n) + 1;
-                dog_flatness_thres = 0.01;
-                dist_thres = 1;
-                edge_thres = 0.1;  % Maybe 0.001
-                [matches_, match_coordinates_1, match_coordinates_2, feature_coordinates_1] = findMatches(images(:, :, :, i), images(:, :, :, next), dog_flatness_thres, dist_thres, edge_thres);
-
-                % 2nd step: Apply normalized 8-point RANSAC algorithm to find best matches
-                % disp("2nd step: Apply normalized 8-point RANSAC algorithm to find best matches");
-                [~, inliers] = estimateFundamentalMatrix(match_coordinates_1(1:2, :), match_coordinates_2(1:2, :));
-                matches{i} = matches_(:,inliers);
-                C{i} = feature_coordinates_1(1:2, :);
-            end
-            save(strcat(dir_generated, 'matches_own.mat'), 'matches');
-            save(strcat(dir_generated, 'C_own.mat'), 'C');
-        end
-end
+[C, matches] = step_1_2(step1, choice_step1, dir_generated, dir_features, n, images);
 
 disp("----");
 %% 3rd step: Represent point correspondes for different camera views
 disp("3rd step: Represent point correspondes for different camera views");
 
-[PV] = chainimages(Matches);
+PV = step_3(matches);
 
 disp("----");
 %% 4th step: Stitch points together
 disp("4th step: Stitch points together");
 
-Clouds = {};
-i = 1;
-numFrames = 3;
-
-for iBegin = 1:n
-    iEnd = mod(iBegin + 2, n); 
-
-    % Select frames from the PV matrix to form a block
-    if iBegin < iEnd
-        ind = iBegin:iEnd;
-    else
-        ind = [iBegin:n 1:iEnd];
-    end
-    block = PV(ind, :);
-
-    % Select columns from the block that do not have any zeros
-    zeroInds = block ~= 0;
-    colInds = find(zeroInds(1, :) .* zeroInds(2, :) .* zeroInds(3, :));
-
-    % Check the number of visible points in all views
-    numPoints = length(colInds);
-    if numPoints < 8
-        continue
-    end
-
-
-    % Create measurement matrix X with coordinates instead of indices using the block and the 
-    % Coordinates C 
-    block = block(:, colInds);
-    X = zeros(2 * numFrames, numPoints);
-    for f = 1:numFrames    
-        coord = C{ind(f)};
-        X(2 * f - 1, :) = coord(1, block(f, :));
-        X(2 * f, :)     = coord(2, block(f, :));
-    end
-
-    save(strcat(dir_generated, 'X.mat'), 'X');
-
-    % Estimate 3D coordinates of each block following Lab 4 "Structure from Motion" to compute the M and S matrix.
-    % Here, an additional output "p" is added to deal with the non-positive matrix error
-    % Please check the chol function inside sfm.m for detail.
-    [M, S, p] = sfm(dir_generated);     % Your structure from motion implementation for the measurements X
-
-    if i == 1 && ~p
-        M1 = M(1:2, :);
-        MeanFrame1 = sum(X, 2) / numPoints;
-    end
-    if ~p
-        % Compose Clouds in the form of (M,S,colInds)
-        Clouds(i, :) = {M, S, colInds};
-        i = i + 1;
-    end
-end
-
-% By an iterative manner, stitch each 3D point set to the main view using the point correspondences i.e., finding optimal
-% transformation between shared points in your 3D point clouds. 
-
-% Initialize the merged (aligned) cloud with the main view, in the first point set.
-mergedCloud                 = zeros(3, size(PV,2));
-mergedCloud(:, Clouds{1,3}) = Clouds{1, 2};  
-mergedInds                  = Clouds{1, 3};
-
-% Stitch each 3D point set to the main view using procrustes
-numClouds = size(Clouds,1);
-for i = 2:numClouds
-
-    newCloudInds = Clouds{i, 3};
-    % Get the points that are in the merged cloud and the new cloud by using "intersect" over indexes
-    [sharedInds, ~, IB] = intersect(mergedInds, newCloudInds);
-    sharedPoints = Clouds{i, 2}(:, IB);
-
-    % A certain number of shared points to do procrustes analysis.
-    if size(sharedPoints, 2) < 15
-        continue
-    end
-
-    % Find optimal transformation between shared points using procrustes
-    [~, ~, T] = procrustes(mergedCloud(:, sharedInds)', sharedPoints');
-
-    % Find the points that are not shared between the merged cloud and the Clouds{i,:} using "setdiff" over indexes
-    [iNew, iCloudsNew] = setdiff(newCloudInds, mergedInds);
-
-    % T.c is a repeated 3D offset, so resample it to have the correct size
-    T.c = T.c(ones(size(iCloudsNew,1),1),:);
-    %T.c = T.c(:, ones(size(iCloudsNew,1),1));
-
-    % Transform the new points using: Z = T.b * T * T.T + T.c.
-    % and store them in the merged cloud, and add their indexes to merged set
-    mergedCloud(:, iNew) = T.b * T.T' * Clouds{i, 2}(:, iCloudsNew) + T.c';
-    mergedInds           = [mergedInds iNew];
-end
-
-mergedCloud(3,:) = mergedCloud(3,:) * (-1);
+mergedCloud = step_4(PV, n, C, dir_generated);
 
 disp("----");
 %% 5th step: Eliminate affine ambiguity
 disp("5th step: Eliminate affine ambiguity");
+
+% Is this needed? Already done in sfm...
 
 % Eliminate the affine ambiguity
 % Orthographic: We need to impose that image axes (a1 and a2) are perpendicular and their scale is 1.
@@ -219,12 +65,6 @@ disp("----");
 %% 6th step: Plot 3D model
 disp("6th step: Plot 3D model");
 
-X = mergedCloud(1,:)';
-Y = mergedCloud(2,:)';
-Z = mergedCloud(3,:)';
-scatter3(X, Y, Z, 20, [1 0 0], 'filled');
-axis( [-500 500 -500 500 -500 500] )
-daspect([1 1 1])
-rotate3d
+step_6(mergedCloud);
 
 disp("----");

@@ -92,8 +92,3 @@ function [bestF, bestinliers] = estimateFundamentalMatrix(match1, match2)
     pause(0.001);
     disp(strcat(int2str(size(bestinliers,2)), ' inliers found'));
 end
-
-
-
-
-

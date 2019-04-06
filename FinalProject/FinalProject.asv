@@ -10,19 +10,19 @@ step1 = struct('haraff_hesaff', 1, 'library', 2, 'own', 3);
 
 choice_step1 = step1.haraff_hesaff;
 dir_generated = './generated/';
-dir_features = './modelCastle_features/';
+dir_features = './model_castle/';
 
 
 %% 0nd step: Read the images and resize
 disp("0nd step: Read the images and resize");
 
-if exist(strcat(dir_generated, 'images.mat'))
-    load(strcat(dir_generated, 'images.mat'));
-else
-    images = imageParser(dir_features, 'png');
+% if exist(strcat(dir_generated, 'images.mat'))
+%     load(strcat(dir_generated, 'images.mat'));
+% else
+    images = imageParser(dir_features, 'jpg');
     images = imresize(images, 0.35);  % Prevent Out-of-Memory exception
-    save(strcat(dir_generated, 'images.mat'), 'images');
-end
+%     save(strcat(dir_generated, 'images.mat'), 'images');
+% end
 n = size(images, 4);
 
 disp("----");
@@ -74,7 +74,7 @@ switch choice_step1
                 fprintf("Iteration %d of %d\n", i, n);
                 next = mod(i, n) + 1;
                 dog_flatness_thres = 0.01;
-                dist_thres = 1;
+                dist_thres = 0.8;
                 edge_thres = 0.1;  % Maybe 0.001
                 [matches_, match_coordinates_1, match_coordinates_2, feature_coordinates_1] = findMatches(images(:, :, :, i), images(:, :, :, next), dog_flatness_thres, dist_thres, edge_thres);
 
