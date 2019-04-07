@@ -1,4 +1,4 @@
-function [matches] = SIFTmatch(d1, d2)
+function [matches] = findMatches(d1, d2)
 %UNTITLED3 Summary of this function goes here
 %   Detailed explanation goes here
     % Converting to grayscale and single for using vl
@@ -15,7 +15,7 @@ function [matches] = SIFTmatch(d1, d2)
 
         bestDist = Inf;
         secondBestDist = Inf;
-        bestmatch = [0 0];
+        bestmatch = [0; 0];
         desc1 = d1(:,index1);
         
         % Loop over the descriptors of the second image

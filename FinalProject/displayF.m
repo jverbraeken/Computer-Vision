@@ -7,7 +7,7 @@ disp(F);
 
 
 % Show the images with matched points
-figure(1);
+figure;
 imshow([img1,img2],'InitialMagnification', 'fit');
 title('Images with matched points'); hold on;
 
@@ -18,7 +18,7 @@ line([X1(1,inliers);size(img1,2)+X2(1,inliers)], [X1(2,inliers);X2(2,inliers)], 
 outliers = setdiff(1:length(X1),inliers);
 line([X1(1,outliers);size(img1,2)+X2(1,outliers)], [X1(2,outliers);X2(2,outliers)], 'Color', 'r');
 
-figure(2);
+figure;
 % Visualize epipolar lines
 subplot(1,2,1);
 imshow(img1,'InitialMagnification', 'fit');

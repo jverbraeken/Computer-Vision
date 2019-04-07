@@ -25,7 +25,7 @@ function [] = surfaceRender(pointcloud, M, Mean, img)
     % % % that is perpendicular (orthogonal) to both a and b, 
     % % % with a direction given by the right-hand rule and a magnitude 
     % % % equal to the area of the parallelogram that the vectors span.
-    viewdir = cross(M(1,:), M(2,:));
+    viewdir = cross(M(2,:), M(1,:));
     viewdir = viewdir / sum(abs(viewdir)); % sum(abs(viewdir))=1
     viewdir = viewdir';
     

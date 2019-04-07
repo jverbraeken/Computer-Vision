@@ -44,6 +44,8 @@ function [C, D, Matches] = ransac_match(directory, plotEpipolars)
         desc2  = D{next};
         
         disp('Matching Descriptors'); drawnow('update')
+        disp('image num');
+        i
         
         % Find matches according to extracted descriptors using vl_ubcmatch
         %match = vl_ubcmatch(desc1,  desc2);
