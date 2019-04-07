@@ -1,6 +1,5 @@
 % Final Project for Computer Vision
 % April 2019, Delft
-% Author: Ioannis Lelekas
 
 %% Step 0: parameter tuning for running the script
 
@@ -22,7 +21,7 @@ plotEpipolars = true;
 % harrris: own implemented Harris feature detection and matching
 % sift: using the vl_feat toolbox detection and matching
 % features: using supplied features and vl_feat for matching (USE THIS FOR GOOD RESULTS)
-mode = 'harris';
+mode = 'features';
 
 Files=dir(strcat(directory, '*.png'));
 %% Step 1-2: Matching

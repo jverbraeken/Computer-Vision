@@ -1,12 +1,15 @@
-%  Apply normalized 8-point RANSAC algorithm to find best matches
-% Input:
+function [C, D, Matches] = ransac_match(directory, plotEpipolars)
+% % Input:
 %     -directory: where to load images
+%     -plotEpipolars: binary parameter whether figures with epipolar lines
+%     will be created
 % Output:
 %     -C: coordinates of interest points
 %     -D: descriptors of interest points
 %     -Matches:Matches (between each two consecutive pairs, including the last & first pair)
+%  Apply normalized 8-point RANSAC algorithm to find best matches
 
-function [C, D, Matches] = ransac_match(directory, plotEpipolars)
+
     Files=dir(strcat(directory, '*.png'));
     n = length(Files);
 
@@ -48,10 +51,7 @@ function [C, D, Matches] = ransac_match(directory, plotEpipolars)
         i
         
         % Find matches according to extracted descriptors using vl_ubcmatch
-        %match = vl_ubcmatch(desc1,  desc2);
-        im1 = rgb2gray(imread(strcat(directory, Files(i).name)));
-        im2 = rgb2gray(imread(strcat(directory, Files(next).name)));
-        match = SIFTmatch(im1,im2,0.8);
+        match = vl_ubcmatch(desc1,  desc2);
         disp(strcat( int2str(size(match,2)), ' matches found'));drawnow('update')
         
         % Obatain X,Y coordinates of matches points
@@ -72,5 +72,4 @@ function [C, D, Matches] = ransac_match(directory, plotEpipolars)
         Matches{i} = match(:,inliers);
         
     end
-
 end

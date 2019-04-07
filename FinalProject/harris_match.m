@@ -1,6 +1,15 @@
 function [C, D, Matches] = harris_match(directory, plotEpipolars)
-%UNTITLED Summary of this function goes here
-%   Detailed explanation goes here
+% Input:
+%     -directory: where to load images
+%     -plotEpipolars: binary parameter whether figures with epipolar lines
+%     will be created
+% Output:
+%     -C: coordinates of interest points
+%     -D: descriptors of interest points
+%     -Matches:Matches (between each two consecutive pairs, including the last & first pair)
+% Performs feature detection and correspondence matching by using owr own 
+% implementation of Harris corner detection and matching respectively. 
+% Apply normalized 8-point RANSAC algorithm to find best matches
 
 Files=dir(strcat(directory, '*.png'));
 n = length(Files);

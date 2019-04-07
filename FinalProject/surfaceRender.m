@@ -1,18 +1,15 @@
-% function [] = surfaceRender(pointcloud, M, Mean, img)
-% project every point on the surface to the main view (camera plane) as reconstructed from sfm,
-% and use the projected coordinates to find RGB (texture) colour of the related points.
-
-% Inputs:
-% - pointcloud: reconstructed point clould
-% - M: transformation matrix of the main view (camera plane) where all
-% - points are projected
-% - Mean: Mean values of the main view (this will be used during coordinates (de)normalization) 
-% - img: corresponding image of main view
-%
-% Outputs:
-% - None
 function [] = surfaceRender(pointcloud, M, Mean, img)
-
+% Projects every point on the surface to the main view (camera plane) as 
+% reconstructed from sfm, and use the projected coordinates to find RGB 
+% (texture) colour of the related points.
+% Inputs:
+%       - pointcloud: reconstructed point clould
+%       - M: transformation matrix of the main view (camera plane) where all
+%       - points are projected
+%       - Mean: Mean values of the main view (this will be used during coordinates (de)normalization) 
+%       - img: corresponding image of main view
+%
+% Outputs: None
 
     % (X,Y,Z) of the point cloud
     pointcloud = unique(pointcloud', 'rows')';
@@ -28,7 +25,7 @@ function [] = surfaceRender(pointcloud, M, Mean, img)
     viewdir = cross(M(2,:), M(1,:));
     viewdir = viewdir / sum(abs(viewdir)); % sum(abs(viewdir))=1
     viewdir = viewdir';
-    
+
     % % Centre point cloud around zero and use dot product to remove points
     % % behind the mean
     m  = [mean(X); mean(Y); mean(Z)]; 
@@ -103,7 +100,7 @@ function [] = surfaceRender(pointcloud, M, Mean, img)
 
     % Display surface
     surf(qx, qy, qz, qc);
-     
+
     % Render parameters
     %axis([-500 500 -500 500 -500 500]);
     axis([-1000 1000 -1000 1000 -1000 1000]);
@@ -111,4 +108,5 @@ function [] = surfaceRender(pointcloud, M, Mean, img)
     rotate3d;
 
     shading flat;
+
 end
