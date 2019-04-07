@@ -1,6 +1,0 @@
-function G = gaussian(sigma)
-    result = zeros(3*sigma, 1);
-    for i = 1:3*sigma
-        result
-    end
-end
