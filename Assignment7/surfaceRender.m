@@ -51,9 +51,9 @@ function [] = surfaceRender(pointcloud, M, Mean, img)
     % Surface generation using TriScatteredInterp
     % You can also use scatteredInterpolant instead.
     % Please check the detailed usage of these functions
-    F  = scatteredInterpolant(X', Y', Z');
+    F  = TriScatteredInterp(X', Y', Z');
     qz = F(qx,qy);
-    qz = conv2(qz, [0.25; 0.5; 0.25], 'same');
+    qz = conv2(qz, [0.25; 0.5; 0.25], 'same');  % TODO do we want to smooth?
 
     % Note: qz contains NaNs because some points in Z direction may not defined
     % This will lead to NaNs in the following calculation.
@@ -61,9 +61,9 @@ function [] = surfaceRender(pointcloud, M, Mean, img)
 
     % Reshape (qx,qy,qz) to row vectors for next step
     %qxrow = reshape(qx, [numel(qx), 1]); 
-    qxrow = qx(:)';
-    qyrow = qy(:)';
-    qzrow = qz(:)';
+    qxrow = reshape(qx, 1, numel(qx));
+    qyrow = reshape(qy, 1, numel(qy));
+    qzrow = reshape(qz, 1, numel(qz));
 
     % Transform to the main view using the corresponding motion / transformation matrix, M
     q_xy = M * [qxrow; qyrow; qzrow];
