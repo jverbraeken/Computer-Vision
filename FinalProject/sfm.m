@@ -12,11 +12,12 @@
 %   M: The transformation matrix size of 2nx3. Where n is the number of cameras i.e. images.
 %   S: The estimated 3-dimensional locations of the points (3x#points).
 
-function [M, S, p] = sfm(directory)
-    close all
+function [M, S, p] = sfm()
+    close all;
+    global dir_generated;
 
     % Load initial set of points
-    X = importdata(strcat(directory, 'X.mat'));
+    X = importdata(strcat(dir_generated, 'X.mat'));
 
     %[~, noPoints] = size(X);
     % Centering: subtract the centroid of the image points (removes translation)
@@ -35,7 +36,7 @@ function [M, S, p] = sfm(directory)
     % Compute M and S: One possible decomposition is M = U W^{1/2} and S = W^{1/2} V'
     M = U * W^(1/2);
     S = W^(1/2) * V';
-    save('M','M')
+    save(strcat(dir_generated, 'M'),'M');
 
     % Eliminate the affine ambiguity
     % Orthographic: We need to impose that image axes (a1 and a2) are perpendicular and their scale is 1.

@@ -1,21 +1,22 @@
 function [mergedCloud, mainView, M1, MeanFrame1] = stitching(directory, PV, C)
-% Performing the 4th step of the pipeline, namely the stitching. Creates
-% the measurement matrix from the extracted PV from the previous step.
-% Estimates 3D coordinates using TK factorization and finally performs the
-% stitching to output a mergedCloud
-%  Input: 
-%       - directory: where to load images
-%       - PV: point-view matrix extracted from step 3
-%       - C: coordinates of interest points
-% Output:
-%       - mergedCloud: the mergedCloud after performing the stitching
-%       - mainView, M1, MeanFrame1: the id, the measurement matrix and the
-%       mean values from the image used as the main on for the next step
-%       and the surface rendering
+    % Performing the 4th step of the pipeline, namely the stitching. Creates
+    % the measurement matrix from the extracted PV from the previous step.
+    % Estimates 3D coordinates using TK factorization and finally performs the
+    % stitching to output a mergedCloud
+    %  Input: 
+    %       - directory: where to load images
+    %       - PV: point-view matrix extracted from step 3
+    %       - C: coordinates of interest points
+    % Output:
+    %       - mergedCloud: the mergedCloud after performing the stitching
+    %       - mainView, M1, MeanFrame1: the id, the measurement matrix and the
+    %       mean values from the image used as the main on for the next step
+    %       and the surface rendering
 
-% Stitching: with affine Structure from Motion
-% Stitch every 3 images together to create a point cloud.
-
+    % Stitching: with affine Structure from Motion
+    % Stitch every 3 images together to create a point cloud.
+    global dir_generated;
+    
     n = length(C);
 
     Clouds = {};
@@ -57,12 +58,12 @@ function [mergedCloud, mainView, M1, MeanFrame1] = stitching(directory, PV, C)
             X(2 * f, :)     = coord(2, block(f, :));
         end
 
-        save(strcat(directory, 'X.mat'), 'X');
+        save(strcat(dir_generated, 'X.mat'), 'X');
 
         % Estimate 3D coordinates of each block following Lab 4 "Structure from Motion" to compute the M and S matrix.
         % Here, an additional output "p" is added to deal with the non-positive matrix error
         % Please check the chol function inside sfm.m for detail.
-        [M, S, p] = sfm(directory);     % Your structure from motion implementation for the measurements X
+        [M, S, p] = sfm();     % Your structure from motion implementation for the measurements X
 
         if mainViewNotSet && ~p
             mainView = i;

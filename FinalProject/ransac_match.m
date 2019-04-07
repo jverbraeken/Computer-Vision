@@ -19,9 +19,8 @@ function [C, D, Matches] = ransac_match(directory, plotEpipolars)
     % Load all features (coordinates and descriptors of interest points)
     % As an example, we concatenate the haraff and hesaff sift features
     % You can also use features extracted from your own Harris function.
-    for i = 1:n
-        disp('image num');
-        i
+    parfor i = 1:n
+        disp(strcat('image num: ', num2str(i)));
         [coord_haraff,desc_haraff,~,~] = loadFeatures(strcat(directory, Files(i).name, '.haraff.sift'));
         [coord_hesaff,desc_hesaff,~,~] = loadFeatures(strcat(directory, Files(i).name, '.hesaff.sift'));
         
@@ -35,9 +34,7 @@ function [C, D, Matches] = ransac_match(directory, plotEpipolars)
     % Initialize Matches (between each two consecutive pairs)
     Matches={};
 
-    for i = 1:n
-        
-        
+    parfor i = 1:n
         next = mod(i, n) + 1;
                 
         coord1 = C{i};
@@ -47,11 +44,10 @@ function [C, D, Matches] = ransac_match(directory, plotEpipolars)
         desc2  = D{next};
         
         disp('Matching Descriptors'); drawnow('update')
-        disp('image num');
-        i
+        disp(strcat('image num: ', num2str(i)));
         
         % Find matches according to extracted descriptors using vl_ubcmatch
-        match = vl_ubcmatch(desc1,  desc2);
+        match = ubcmatch(desc1,  desc2);
         disp(strcat( int2str(size(match,2)), ' matches found'));drawnow('update')
         
         % Obatain X,Y coordinates of matches points

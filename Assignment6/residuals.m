@@ -10,7 +10,7 @@
 function diff = residuals(L)
 
 % Load the saved transformation matrix
-M = load('M');
+M = load(strcat(dir_generated, 'M'));
 M = M.M;
 
 % Pre-allocate the residuals matrix

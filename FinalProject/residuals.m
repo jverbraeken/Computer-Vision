@@ -8,22 +8,23 @@
 %   - diff: a matrix (n x 4) containing the residuals for the n cameras
 
 function diff = residuals(L)
+    global dir_generated;
+    % Load the saved transformation matrix
+    M = load(strcat(dir_generated, 'M'));
+    M = M.M;
 
-% Load the saved transformation matrix
-M = load('M');
-M = M.M;
+    % Pre-allocate the residuals matrix
+    diff = zeros(size(M,1)/2,4);
 
-% Pre-allocate the residuals matrix
-diff = zeros(size(M,1)/2,4);
+    % Compute the residuals
+    for i = 1:size(M, 1)/2 % Loop over the cameras
 
-% Compute the residuals
-for i = 1:size(M, 1)/2 % Loop over the cameras
+        % Define the x and y projections: 
+        Ai = M(i*2-1 : i*2, :); 
 
-    % Define the x and y projections: 
-    Ai = M(i*2-1 : i*2, :); 
+        % Definite the function to be minimized: Ai L Ai' - Id = 0
+        diff_i = Ai * L * Ai' - eye(2);
 
-    % Definite the function to be minimized: Ai L Ai' - Id = 0
-    diff_i = Ai * L * Ai' - eye(2);
-
-    diff(i,:) = diff_i(:);
+        diff(i,:) = diff_i(:);
+    end
 end

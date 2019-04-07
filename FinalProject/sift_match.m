@@ -1,65 +1,61 @@
 function [C, D , Matches] = sift_match(directory, plotEpipolars)
-% % Input:
-%     -directory: where to load images
-%     -plotEpipolars: binary parameter whether figures with epipolar lines
-%     will be created
-% Output:
-%     -C: coordinates of interest points
-%     -D: descriptors of interest points
-%     -Matches:Matches (between each two consecutive pairs, including the last & first pair)
-%  Performs feature detection and correspondence matches by using the
-%  vl_feat toolbox. Apply normalized 8-point RANSAC algorithm to find best matches
+    % % Input:
+    %     -directory: where to load images
+    %     -plotEpipolars: binary parameter whether figures with epipolar lines
+    %     will be created
+    % Output:
+    %     -C: coordinates of interest points
+    %     -D: descriptors of interest points
+    %     -Matches:Matches (between each two consecutive pairs, including the last & first pair)
+    %  Performs feature detection and correspondence matches by using the
+    %  vl_feat toolbox. Apply normalized 8-point RANSAC algorithm to find best matches
 
-Files=dir(strcat(directory, '*.png'));
-n = length(Files);
+    Files=dir(strcat(directory, '*.png'));
+    n = length(Files);
 
-C = {};
-D = {};
-for i=1:n 
-    disp('image num');
-    i
-    im = single(rgb2gray(imread(strcat(directory, Files(i).name))));
-    [coord, desc] = vl_sift(im); 
-    C{i} = coord(1:2, :);
-    D{i} = desc;
-end
-
-for i = 1:n
-   
-    next = mod(i, n) + 1;
-                
-    coord1 = C{i};
-    desc1  = D{i};
-
-    coord2 = C{next};
-    desc2  = D{next};
-
-    disp('Matching Descriptors'); drawnow('update')
-    disp('image num');
-    i
-
-    % Find matches according to extracted descriptors using vl_ubcmatch
-    match = vl_ubcmatch(desc1,  desc2);
-    disp(strcat( int2str(size(match,2)), ' matches found'));drawnow('update')
-
-    % Obatain X,Y coordinates of matches points
-    match1 = coord1(:, match(1, :));
-    match2 = coord2(:, match(2, :));
-
-    % Find inliers using normalized 8-point RANSAC algorithm
-    [F, inliers] = estimateFundamentalMatrix(match1,match2);
-
-    if plotEpipolars
-        img1 = rgb2gray(imread(strcat(directory, Files(i).name)));
-        img2 = rgb2gray(imread(strcat(directory, Files(next).name)));
-
-        displayF(F, inliers, match1, match2, img1, img2);
+    C = {};
+    D = {};
+    
+    parfor i=1:n
+        disp(strcat('image num: ', num2str(i)));
+        im = single(rgb2gray(imread(strcat(directory, Files(i).name))));
+        [coord, desc] = vl_sift(im); 
+        C{i} = coord(1:2, :);
+        D{i} = desc;
     end
 
-    drawnow('update')
-    Matches{i} = match(:,inliers);
+    parfor i = 1:n
+        next = mod(i, n) + 1;
+
+        coord1 = C{i};
+        desc1  = D{i};
+
+        coord2 = C{next};
+        desc2  = D{next};
+
+        disp('Matching Descriptors'); drawnow('update')
+        disp('image num');
+        i
+
+        % Find matches according to extracted descriptors using vl_ubcmatch
+        match = vl_ubcmatch(desc1,  desc2);
+        disp(strcat( int2str(size(match,2)), ' matches found'));drawnow('update')
+
+        % Obatain X,Y coordinates of matches points
+        match1 = coord1(:, match(1, :));
+        match2 = coord2(:, match(2, :));
+
+        % Find inliers using normalized 8-point RANSAC algorithm
+        [F, inliers] = estimateFundamentalMatrix(match1,match2);
+
+        if plotEpipolars
+            img1 = rgb2gray(imread(strcat(directory, Files(i).name)));
+            img2 = rgb2gray(imread(strcat(directory, Files(next).name)));
+
+            displayF(F, inliers, match1, match2, img1, img2);
+        end
+
+        drawnow('update')
+        Matches{i} = match(:,inliers);
+    end
 end
-
-
-end
-
