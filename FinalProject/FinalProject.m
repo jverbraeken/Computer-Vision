@@ -11,7 +11,7 @@ close all;
 % uncomment the first for runnning the pipeline for the castle images and
 % the second for the teddy images
 %dir_data = './modelCastle_features/modelCastle_features/';
-dir_data = 'TeddyBearPNG/';
+dir_data = 'modelCastle_features/';
 
 % directory for storing temporary generated data (cache)
 global dir_generated;

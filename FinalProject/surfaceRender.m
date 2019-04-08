@@ -49,7 +49,9 @@ function [] = surfaceRender(pointcloud, M, Mean, img)
     % You can also use scatteredInterpolant instead.
     % Please check the detailed usage of these functions
     F  = TriScatteredInterp(X', Y', Z');
-    qz = F(qx,qy); 
+    qz = F(qx,qy);
+    % Apply some smoothing to reduce sharp peaks
+    % qz = conv2(qz, repmat(0.02, 50, 1), 'same');
 
     % Note: qz contains NaNs because some points in Z direction may not defined
     % This will lead to NaNs in the following calculation.
