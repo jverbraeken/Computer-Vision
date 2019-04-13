@@ -9,8 +9,8 @@ close all
 % directories for loading images and exporting results
 % uncomment the first for runnning the pipeline for the castle images and
 % the second for the teddy images
-%directory = './modelCastle_features/modelCastle_features/';
-directory = './TeddyBearPNG/';
+directory = './modelCastle_features/modelCastle_features/';
+%directory = './TeddyBearPNG/';
 
 % set to true in case you want epipolar lines between consecutive images to
 % be plotted
@@ -88,8 +88,8 @@ scatter3(X, Y, Z, 20, [1 0 0], 'filled');
 xlabel('x-axis')
 ylabel('y-label')
 zlabel('z-axis')
-axis( [-500 500 -500 500 -500 500] )
-%axis( [-1000 1000 -1000 1000 -1000 1000] )
+%axis( [-500 500 -500 500 -500 500] )
+axis( [-1000 1000 -1000 1000 -1000 1000] )
 daspect([1 1 1])
 rotate3d
 
