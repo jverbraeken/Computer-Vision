@@ -11,7 +11,7 @@ close all;
 % uncomment the first for runnning the pipeline for the castle images and
 % the second for the teddy images
 %dir_data = './modelCastle_features/modelCastle_features/';
-dir_data = 'modelCastle_features/';
+dir_data = 'TeddyBearPNG/';
 
 % directory for storing temporary generated data (cache)
 global dir_generated;
@@ -26,7 +26,7 @@ plotEpipolars = false;
 %   harris: own implemented Harris feature detection and matching
 %   sift: using the vl_feat toolbox detection and matching
 %   features: using supplied features and vl_feat for matching (USE THIS FOR GOOD RESULTS)
-mode = 'features';
+mode = 'harris';
 
 Files=dir(strcat(dir_data, '*.png'));
 %% Step 1-2: Matching
@@ -85,6 +85,7 @@ disp('4th step: Stitching & elimination of affine ambiguity from sfm')
 X = mergedCloud(1,:)';
 Y = mergedCloud(2,:)';
 Z = mergedCloud(3,:)';
+
 figure
 scatter3(X, Y, Z, 20, [1 0 0], 'filled');
 xlabel('x-axis')

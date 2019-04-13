@@ -25,6 +25,19 @@ function [C, D, Matches] = harris_match(directory, plotEpipolars)
         disp(strcat('image num: ', num2str(i)));
          % Find features and make descriptor of image 1 2
         im = rgb2gray(imread(strcat(directory, Files(i).name)));
+%         se = strel('disk', 1, 4);
+%         morph_grad = imsubtract(imdilate(im, se), imerode(im, se));
+%         mask = im2bw(morph_grad, 0.04);
+%         se = strel('disk', 3, 4);
+%         mask = imclose(mask, se);
+%         mask = imfill(mask, 'holes');
+%         mask = bwareafilt(mask, 1);
+%         not_mask = ~mask;
+%         mask = mask | bwpropfilt(not_mask, 'area', [-Inf, 1000 - eps(1000)]);
+%         mask_3d = repmat(mask, 1, 1, 3);
+%         
+%         im(~mask) = 0;
+        
         loc = DoG(im, 0.001);
         [row, col, scale] = harris(im, loc, thres);
         frames = [col'; row'; scale'; zeros(1, size(row, 1))];

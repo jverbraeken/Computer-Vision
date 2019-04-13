@@ -18,8 +18,21 @@ function [C, D , Matches] = sift_match(directory, plotEpipolars)
     
     parfor i=1:n
         disp(strcat('image num: ', num2str(i)));
-        im = single(rgb2gray(imread(strcat(directory, Files(i).name))));
-        [coord, desc] = vl_sift(im); 
+        im = rgb2gray(imread(strcat(directory, Files(i).name)));
+        se = strel('disk', 1, 4);
+        morph_grad = imsubtract(imdilate(im, se), imerode(im, se));
+        mask = im2bw(morph_grad, 0.03);
+        se = strel('disk', 3, 4);
+        mask = imclose(mask, se);
+        mask = imfill(mask, 'holes');
+        mask = bwareafilt(mask, 1);
+        not_mask = ~mask;
+        mask = mask | bwpropfilt(not_mask, 'area', [-Inf, 1000 - eps(1000)]);
+        se = strel('disk', 30);
+        mask = imclose(mask, se);
+        mask = imfill(mask, 'holes');
+        im(~mask) = 0;
+        [coord, desc] = vl_sift(single(im));
         C{i} = coord(1:2, :);
         D{i} = desc;
     end
