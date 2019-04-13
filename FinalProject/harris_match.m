@@ -14,10 +14,8 @@ function [C, D, Matches] = harris_match(directory, plotEpipolars)
 Files=dir(strcat(directory, '*.png'));
 n = length(Files);
 
-load('C_harris.mat');
-load('D_harris.mat');
 
-thres = 0.8;
+thres = 0.1;
 
 C ={};
 D ={};
@@ -29,7 +27,7 @@ for i = 1:n
     i
      % Find features and make descriptor of image 1 2
     im = rgb2gray(imread(strcat(directory, Files(i).name)));
-    loc = DoG(im, 0.001);
+    loc = DoG(im, 0.8);
     [row, col, scale] = harris(im, loc, thres);
     frames = [col'; row'; scale'; zeros(1, size(row, 1))];
     [~, desc] = vl_sift(single(im), 'frames', frames);

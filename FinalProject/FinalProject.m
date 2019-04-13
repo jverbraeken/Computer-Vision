@@ -25,7 +25,7 @@ mode = 'features';
 
 Files=dir(strcat(directory, '*.png'));
 %% Step 1-2: Matching
-disp("1st step: Find correspondences between consecutive matching");
+disp("1st & 2nd step: Find correspondences between consecutive matching");
 
 switch mode
     case 'harris'
@@ -65,6 +65,13 @@ disp('3rd step: Chaining')
 
 PV = chainimages(matches);
 
+% visualize PV matrix
+figure
+ylabel('# Frame')
+xlabel('Descriptor index')
+imagesc(PV)
+colormap(gray)
+
 %% Step 4-5: Stitching & elimination of affine ambiguity 
 
 disp('4th step: Stitching & elimination of affine ambiguity from sfm')
@@ -81,7 +88,8 @@ scatter3(X, Y, Z, 20, [1 0 0], 'filled');
 xlabel('x-axis')
 ylabel('y-label')
 zlabel('z-axis')
-axis( [-1500 1500 -1500 1500 -1500 1500] )
+axis( [-500 500 -500 500 -500 500] )
+%axis( [-1000 1000 -1000 1000 -1000 1000] )
 daspect([1 1 1])
 rotate3d
 

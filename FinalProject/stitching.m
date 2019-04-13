@@ -20,13 +20,13 @@ function [mergedCloud, mainView, M1, MeanFrame1] = stitching(directory, PV, C)
 
     Clouds = {};
     i = 1;
-    numFrames=3;
+    numFrames = 3;
 
     mainView = [];
     mainViewNotSet = true;
 
     for iBegin = 1:n
-        iEnd = mod(iBegin + 2, n); 
+        iEnd = mod(iBegin + (numFrames-1), n); 
 
         % Select frames from the PV matrix to form a block
         if iBegin < iEnd

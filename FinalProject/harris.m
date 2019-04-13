@@ -67,8 +67,8 @@ function [r, c, sigmas] = harris(im, loc, thres)
     % Return the coordinates and sigmas
     [r, c, sigmas] = find(R(:,:,2));
     
-    % Display corners
     %{
+    % Display corners
     figure
     hold on
     imshow(im, [])

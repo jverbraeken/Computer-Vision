@@ -9,7 +9,7 @@ function [matches] = findMatches(d1, d2)
     
     matches = [];
     threshold = 100;
-    
+     
     % Loop over the descriptors of the first image
     for index1 = 1:size(d1, 2)
 
@@ -41,17 +41,8 @@ function [matches] = findMatches(d1, d2)
         % Keep the best match and draw
         if (bestDist / secondBestDist) < 0.8
             matches = [matches bestmatch];
-            %c = [c1(bestmatch(1)), size(im1, 2) + c2(bestmatch(2))];
-            %r = [r1(bestmatch(1)) r2(bestmatch(2))];
-            %line(c, r, 'Color', 'green')
-             % You can use the 'line' function in matlab to ... draw the matches
         end
     end
-    
-    %viscircles([c(1), r(1)], s1(bestmatch(1)));
-    %viscircles([c(2), r(2)], s2(bestmatch(2)));
-    
-    
 
 end
 
